@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.mi.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="com.example.mi.ui.Calender.CalenderFragment"
+        android:label="@string/main_calender"
+        tools:layout="@layout/fragment_calender" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.mi.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:name="com.example.mi.ui.Day.DayFragment"
+        android:label="@string/main_day"
+        tools:layout="@layout/fragment_day" />
 </navigation>
