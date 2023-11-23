@@ -1,0 +1,9 @@
+<resources>
+    <string-array name="months_array">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <!-- ... -->
+        <item>December</item>
+    </string-array>
+</resources>

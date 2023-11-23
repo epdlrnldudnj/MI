@@ -1,0 +1,13 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!-- Style for calendar date text appearance -->
+    <style name="CalendarDateStyle" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@android:color/holo_blue_dark</item>
+        <!-- Add more items to style the date text as needed -->
+    </style>
+</resources>
