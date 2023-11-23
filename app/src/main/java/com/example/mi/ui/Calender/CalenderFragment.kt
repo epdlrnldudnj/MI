@@ -1,4 +1,4 @@
-package com.example.mi.ui.Calender
+package com.example.mi.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -28,10 +28,6 @@ class CalenderFragment : Fragment() {
         _binding = FragmentCalenderBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.calender
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
         return root
     }
 
