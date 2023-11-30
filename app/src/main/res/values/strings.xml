@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MI</string>
     <string name="main_calender">Calender</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="main_island">Island</string>
     <string name="main_day">Day</string>
     <string name="name_island">나만의 정원</string>
 </resources>

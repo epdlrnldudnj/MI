@@ -7,14 +7,14 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.mi.ui.home.CalenderFragment"
+        android:name="com.example.mi.ui.Calender.CalenderFragment"
         android:label="@string/main_calender"
         tools:layout="@layout/fragment_calender" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.mi.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
+        android:name="com.example.mi.ui.dashboard.IslandFragment"
+        android:label="@string/main_island"
         tools:layout="@layout/fragment_island" />
 
     <fragment
