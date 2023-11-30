@@ -12,6 +12,16 @@ import com.example.mi.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var mindpiece:Int = 0
+
+    internal fun addpiece(how: Int): Int {
+        mindpiece += how
+        return mindpiece
+    }
+    fun minuspiece(how: Int): Int{
+        mindpiece -= how
+        return mindpiece
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,5 +40,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
         navView.setupWithNavController(navController)
+
     }
 }
