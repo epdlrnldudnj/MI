@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.mi.ui.Calender.CalenderFragment"
+        android:name="com.example.mi.ui.Calender.CalendarFragment"
         android:label="@string/main_calender"
         tools:layout="@layout/fragment_calender" />
 
