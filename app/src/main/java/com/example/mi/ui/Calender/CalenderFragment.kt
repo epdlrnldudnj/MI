@@ -4,36 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mi.databinding.FragmentCalenderBinding
-import com.example.mi.ui.Calender.CalenderViewModel
+import com.example.mi.ui.Day.DaysAdapter
 
-class CalenderFragment : Fragment() {
+class CalendarFragment : Fragment() {
 
-    private var _binding: FragmentCalenderBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private val viewModel: CalendarViewModel by viewModels()
+    private lateinit var binding: FragmentCalenderBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(CalenderViewModel::class.java)
-
-        _binding = FragmentCalenderBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        return root
+        binding = FragmentCalenderBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val daysAdapter = DaysAdapter()
+        binding.recyclerViewCalendar.apply {
+            layoutManager = GridLayoutManager(context, 7) // 7 for a week's days
+            adapter = daysAdapter
+        }
+
+        viewModel.daysLiveData.observe(viewLifecycleOwner) { days ->
+            daysAdapter.submitList(days)
+        }
     }
 }
