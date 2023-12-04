@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mi.databinding.FragmentCalenderBinding
-import com.example.mi.ui.Day.DaysAdapter
+import java.text.DateFormatSymbols
 
 class CalendarFragment : Fragment() {
 
@@ -34,6 +34,10 @@ class CalendarFragment : Fragment() {
 
         viewModel.daysLiveData.observe(viewLifecycleOwner) { days ->
             daysAdapter.submitList(days)
+
+        }
+        viewModel.currentMonth.observe(viewLifecycleOwner) { month -> //현재 달을 표시하는 UI
+            val monthString = DateFormatSymbols().months[month]
         }
     }
 }

@@ -9,10 +9,16 @@ class CalendarViewModel : ViewModel() {
     private val _daysLiveData = MutableLiveData<List<Day>>()
     val daysLiveData: LiveData<List<Day>> = _daysLiveData
 
+    private val _currentMonth = MutableLiveData<Int>()
+    val currentMonth: LiveData<Int> = _currentMonth
+
     init {
         loadDaysForMonth()
     }
 
+    fun getCurrentMonth(): Int {
+        return Calendar.getInstance().get(Calendar.MONTH)
+    }
     private fun loadDaysForMonth() {
         val days = mutableListOf<Day>()
         val calendar = Calendar.getInstance()
@@ -30,6 +36,7 @@ class CalendarViewModel : ViewModel() {
         }
 
         _daysLiveData.value = days
+        _currentMonth.value = calendar.get(Calendar.MONTH)//현재 달 저장 합수
     }
 
     data class Day(val date: Date, val isCurrentMonth: Boolean)
