@@ -10,15 +10,19 @@
         android:layout_height="wrap_content"
         android:textSize="12sp" />
 
-    <TextView
-        android:id="@+id/textViewDayOfWeek"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/textViewDayNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp" />
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/textViewDay"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:gravity="center"
+        android:background="@drawable/day_background"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
 </LinearLayout>

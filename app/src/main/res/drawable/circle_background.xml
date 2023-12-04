@@ -1,5 +1,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle"> <!-- 네모 모양 -->
-    <solid android:color="@color/white" /> <!-- 배경 투명 -->
+    <solid android:color="@color/calendercolor" /> <!-- 배경 투명 -->
     <corners android:radius="10dp"/>
 </shape>
