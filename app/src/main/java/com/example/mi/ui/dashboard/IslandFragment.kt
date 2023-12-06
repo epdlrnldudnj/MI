@@ -8,7 +8,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.mi.MindPiece
 import com.example.mi.databinding.FragmentIslandBinding
+import androidx.appcompat.app.AppCompatActivity
 
 class IslandFragment : Fragment() {
 
@@ -32,15 +34,20 @@ class IslandFragment : Fragment() {
         _binding = FragmentIslandBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+
         // 버튼과 텍스트뷰 찾기
         val testButton: Button = binding.testbutton
-        val textView: TextView = binding.textView2
+        val textView: TextView = binding.testtext
 
-        // 버튼 클릭 리스너 등록
+        val myApp = requireActivity().application as MindPiece
+        var piece = myApp.mindpiece
+        textView.text = piece.toString()
+
         testButton.setOnClickListener {
             // 텍스트뷰의 내용 변경
-
-            textView.text = "버튼이 눌렸습니다"
+            myApp.addpiece(50)
+            piece = myApp.mindpiece
+            textView.text = piece.toString()
         }
 
         return root
