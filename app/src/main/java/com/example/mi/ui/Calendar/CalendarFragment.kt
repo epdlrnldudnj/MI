@@ -1,4 +1,4 @@
-package com.example.mi.ui.Calender
+package com.example.mi.ui.Calendar
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,19 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.mi.databinding.FragmentCalenderBinding
+import com.example.mi.databinding.FragmentCalendarBinding
 import java.text.DateFormatSymbols
 
 class CalendarFragment : Fragment() {
 
     private val viewModel: CalendarViewModel by viewModels()
-    private lateinit var binding: FragmentCalenderBinding
+    private lateinit var binding: FragmentCalendarBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCalenderBinding.inflate(inflater, container, false)
+        binding = FragmentCalendarBinding.inflate(inflater, container, false)
         return binding.root
     }
 

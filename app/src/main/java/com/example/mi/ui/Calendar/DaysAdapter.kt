@@ -1,4 +1,4 @@
-package com.example.mi.ui.Calender
+package com.example.mi.ui.Calendar
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

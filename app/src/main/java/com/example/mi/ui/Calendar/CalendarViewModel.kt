@@ -1,10 +1,11 @@
-package com.example.mi.ui.Calender
+package com.example.mi.ui.Calendar
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import java.util.*
 
-class CalendarViewModel : ViewModel() {
+open class CalendarViewModel : ViewModel() {
 
     private val _daysLiveData = MutableLiveData<List<Day>>()
     val daysLiveData: LiveData<List<Day>> = _daysLiveData
