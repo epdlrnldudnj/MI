@@ -1,43 +1,38 @@
 package com.example.mi.ui.Calendar
-
+// DaysAdapter.kt
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.databinding.ItemDayBinding
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
 
-class DaysAdapter : ListAdapter<CalendarViewModel.Day, DaysAdapter.DayViewHolder>(DIFF_CALLBACK) {
+class DaysAdapter(private val days: ArrayList<LocalDate>) :
+    RecyclerView.Adapter<DaysAdapter.DayViewHolder>() {
+
+    inner class DayViewHolder(private val binding: ItemDayBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun bind(day: LocalDate) {
+            binding.textViewDayNumber.text = day.dayOfMonth.toString()
+            // 여기서 추가적인 날짜 정보를 textViewMonth, textViewDay에 바인딩할 수 있습니다.
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
-        val binding = ItemDayBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemDayBinding.inflate(inflater, parent, false)
         return DayViewHolder(binding)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
-        val day = getItem(position)
+        val day = days[position]
         holder.bind(day)
     }
 
-    class DayViewHolder(private val binding: ItemDayBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(day: CalendarViewModel.Day) {
-            binding.textViewDayNumber.text = SimpleDateFormat("d", Locale.getDefault()).format(day.date)
-            // Highlight the cell if it is in the current month
-            binding.textViewDayNumber.alpha = if (day.isCurrentMonth) 1.0f else 0.5f
-        }
-    }
-
-    companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CalendarViewModel.Day>() {
-            override fun areItemsTheSame(oldItem: CalendarViewModel.Day, newItem: CalendarViewModel.Day): Boolean {
-                return oldItem.date.time == newItem.date.time
-            }
-
-            override fun areContentsTheSame(oldItem: CalendarViewModel.Day, newItem: CalendarViewModel.Day): Boolean {
-                return oldItem.isCurrentMonth == newItem.isCurrentMonth && oldItem.date == newItem.date
-            }
-        }
+    override fun getItemCount(): Int {
+        return days.size
     }
 }

@@ -1,44 +1,37 @@
 package com.example.mi.ui.Calendar
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+// CalendarViewModel.kt
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
-import java.util.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-open class CalendarViewModel : ViewModel() {
+class CalendarViewModel : ViewModel() {
+    // 1.년월 날짜 가져오기위한 변수
+    @RequiresApi(Build.VERSION_CODES.O)
+    private var selectedDate: LocalDate = LocalDate.now()
 
-    private val _daysLiveData = MutableLiveData<List<Day>>()
-    val daysLiveData: LiveData<List<Day>> = _daysLiveData
-
-    private val _currentMonth = MutableLiveData<Int>()
-    val currentMonth: LiveData<Int> = _currentMonth
-
-    init {
-        loadDaysForMonth()
+    // 2. 해당월에서 -1
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun goToPreviousMonth() {
+        selectedDate = selectedDate.minusMonths(1)
     }
 
-    fun getCurrentMonth(): Int {
-        return Calendar.getInstance().get(Calendar.MONTH)
-    }
-    private fun loadDaysForMonth() {
-        val days = mutableListOf<Day>()
-        val calendar = Calendar.getInstance()
-
-        // Set to the first day of the month
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val monthBeginningCell = calendar.get(Calendar.DAY_OF_WEEK) - 1
-
-        // Move calendar backwards to the beginning of the week
-        calendar.add(Calendar.DAY_OF_MONTH, -monthBeginningCell)
-
-        while (days.size < 42) { // Total cells of a 6-row calendar grid
-            days.add(Day(calendar.time, calendar.get(Calendar.MONTH) == Calendar.getInstance().get(Calendar.MONTH)))
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
-        }
-
-        _daysLiveData.value = days
-        _currentMonth.value = calendar.get(Calendar.MONTH)//현재 달 저장 합수
+    // 3. 해당월에서 +1
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun goToNextMonth() {
+        selectedDate = selectedDate.plusMonths(1)
     }
 
-    data class Day(val date: Date, val isCurrentMonth: Boolean)
+    // 4. 날짜 포맷하는 메서드
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getFormattedDate(): String {
+        val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+        return this.selectedDate.format(formatter)
+    }
+
+    // 데이터를 노출하는 함수들 (LiveData 또는 StateFlow를 사용할 수 있음)
+    fun getSelectedDate(): LocalDate {
+        return selectedDate
+    }
 }
