@@ -14,26 +14,50 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
+import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 class DayFragment : Fragment(R.layout.fragment_day) {
     private val dayViewModel: DayViewModel by viewModels()
     private var binding: FragmentDayBinding? = null
+    private val handler = Handler(Looper.getMainLooper())
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
+    private val updateRunnable = object : Runnable {
+        override fun run() {
+            updateDateTime()
+            handler.postDelayed(this, 1000) // 1초마다 업데이트
+        }
+    }
 
+
+    override fun onDestroyView() {
+        handler.removeCallbacks(updateRunnable)
+        super.onDestroyView()
+    }
+
+    private fun updateDateTime() {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val dateTimeString = dateFormat.format(Date())
+        binding?.dayDate?.text = dateTimeString
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDayBinding.bind(view)
 
-        dayViewModel.currentDate.observe(viewLifecycleOwner, { date ->
-            binding?.dayDate?.text = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-        })
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentDayBinding.bind(view)
+        handler.post(updateRunnable)
+
         binding?.btnMoodBox?.setOnClickListener {
             showMoodSelector()
         }
@@ -51,10 +75,7 @@ class DayFragment : Fragment(R.layout.fragment_day) {
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null // View Binding 정리
-    }
+
         private fun showMoodSelector() {
             val moods = arrayOf("행복","기쁨", "슬픔", "화남", "평온", "피곤", "체크") // 이모지나 텍스트를 배열로 정의합니다.
             AlertDialog.Builder(requireContext())
