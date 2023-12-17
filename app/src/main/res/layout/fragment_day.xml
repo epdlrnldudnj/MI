@@ -55,6 +55,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <!-- 오늘의 할 일 입력창 -->
+
         <EditText
             android:id="@+id/etTodo"
             android:layout_width="match_parent"
@@ -63,40 +64,58 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="30dp"
-            android:background="@drawable/addtodayworks"
+            android:background="@drawable/box_background"
             android:drawablePadding="10dp"
             android:gravity="center_vertical"
             android:padding="10dp" />
 
-        <!-- 오늘의 한 컷 제목 -->
-
-        <!-- 이미지 추가 버튼 -->
-
-        <!-- 장기목표 기록 제목 -->
-        <TextView
-            android:id="@+id/tvPhotoTitle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/photobox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/etTodo"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="5sp"
-            android:text="오늘의 한 컷"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btnAddPhoto"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_below="@id/tvPhotoTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="7dp"
-            android:background="@drawable/camera"
-            android:padding="10dp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPhotoTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="오늘의 한 컷"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <ImageButton
+                    android:id="@+id/btnAddPhoto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_below="@id/tvPhotoTitle"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/camera"
+                    android:padding="10dp" />
+            </LinearLayout>
+            <EditText
+                android:id="@+id/photostory"
+                android:layout_width="200dp"
+                android:layout_height="100dp"
+                android:layout_below="@id/tvJournalTitle"
+                android:layout_marginTop="32dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/box_background"
+                />
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@id/btnAddPhoto"
+            android:layout_below="@id/photobox"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             >
@@ -115,16 +134,13 @@
 
                 <EditText
                     android:id="@+id/etJournal"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_width="200dp"
+                    android:layout_height="100dp"
                     android:layout_below="@id/tvJournalTitle"
-                    android:layout_marginLeft="30dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginRight="30dp"
-                    android:background="@drawable/day_icon"
-                    android:drawablePadding="10dp"
-                    android:gravity="center_vertical"
-                    android:padding="10dp" />
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/box_background"
+                    />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -143,12 +159,12 @@
                         android:id="@+id/btnMoodBox"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:layout_below="@id/tvMoodTitle"
+                        android:layout_marginTop="8dp"
 
                         android:background="@drawable/box_background"
-                    android:padding="10dp"
-                    android:scaleType="fitCenter"
-                    />
+                        android:padding="10dp"
+                        android:scaleType="fitCenter"
+                        />
 
             </LinearLayout>
         </LinearLayout>
