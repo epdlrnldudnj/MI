@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -19,24 +20,37 @@
         android:layout_height="589dp">
 
         <!-- 상단 날짜 표시 -->
+
+        <!-- 오늘의 할 일 제목 -->
+
         <TextView
-            android:id="@+id/Date"
+            android:id="@+id/textDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="220dp"
-            android:layout_marginTop="100dp"
-            android:text="Date 2023.11.12"
+
+            android:layout_marginLeft="200dp"
+            android:layout_marginTop="98dp"
+            android:text="Date "
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/dayDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="250dp"
+            android:layout_marginTop="98dp"
+            android:text="2023.11.12"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <!-- 오늘의 할 일 제목 -->
         <TextView
             android:id="@+id/tvTodoTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Date"
+            android:layout_below="@id/dayDate"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="4dp"
             android:text="오늘의 할 일"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -44,7 +58,7 @@
         <EditText
             android:id="@+id/etTodo"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="100sp"
             android:layout_below="@id/tvTodoTitle"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="8dp"
@@ -65,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/etTodo"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="13dp"
+            android:layout_marginTop="5sp"
             android:text="오늘의 한 컷"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -78,52 +92,52 @@
             android:layout_marginTop="7dp"
             android:background="@drawable/camera"
             android:padding="10dp" />
-
-        <!-- 장기목표 입력창 -->
-        <TextView
-            android:id="@+id/tvJournalTitle"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_below="@id/btnAddPhoto"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="11dp"
-            android:text="장기목표기록"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_marginTop="10dp"
+            >
+                <!-- 장기목표 입력창 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvJournalTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-        <EditText
-            android:id="@+id/etJournal"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/tvJournalTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/day_icon"
-            android:drawablePadding="10dp"
-            android:gravity="center_vertical"
-            android:padding="10dp" />
+                    android:text="장기목표기록"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <!-- 오늘의 기분 제목 -->
+                <EditText
+                    android:id="@+id/etJournal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_below="@id/tvJournalTitle"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/day_icon"
+                    android:drawablePadding="10dp"
+                    android:gravity="center_vertical"
+                    android:padding="10dp" />
+        </LinearLayout>
+                <!-- 오늘의 기분 제목 -->
 
-        <!-- 오늘의 기분 추가 버튼들 -->
-        <TextView
-            android:id="@+id/tvMoodTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/etJournal"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="11dp"
-            android:text="오늘의 기분"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!-- 오늘의 기분 추가 버튼들 -->
 
-        <ImageButton
-            android:id="@+id/btnMoodHappy"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_below="@id/tvMoodTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/joy"
-            android:padding="10dp" />
+                <TextView
+                    android:id="@+id/tvMoodTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="오늘의 기분"
+                    android:textAppearance="@style/CalendarDateStyle"
+                     />
+        </LinearLayout>
     </RelativeLayout>
 </FrameLayout>

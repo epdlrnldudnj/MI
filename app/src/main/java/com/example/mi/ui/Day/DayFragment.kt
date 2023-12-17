@@ -1,41 +1,31 @@
 package com.example.mi.ui.Day
 
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
+import java.time.format.DateTimeFormatter
 
-class DayFragment : Fragment() {
+class DayFragment : Fragment(R.layout.fragment_day) {
+    private val dayViewModel: DayViewModel by viewModels()
+    private var binding: FragmentDayBinding? = null
 
-    private var _binding: FragmentDayBinding? = null
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentDayBinding.bind(view)
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(DayViewModel::class.java)
-
-        _binding = FragmentDayBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-//        val textView: TextView = binding.textDay
-//        notificationsViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
-        return root
+        dayViewModel.currentDate.observe(viewLifecycleOwner, { date ->
+            binding?.dayDate?.text = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+        })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null // View Binding 정리
     }
 }
