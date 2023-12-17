@@ -1,36 +1,37 @@
 package com.example.mi.ui.Day
 
-import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
 class DayFragment : Fragment(R.layout.fragment_day) {
-    private val dayViewModel: DayViewModel by viewModels()
     private var binding: FragmentDayBinding? = null
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ChecklistAdapter
+
     private val updateRunnable = object : Runnable {
         override fun run() {
             updateDateTime()
@@ -72,7 +73,33 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             pickImageFromGallery()
         }
 
+        recyclerView = view.findViewById(R.id.rvItems)
+        adapter = ChecklistAdapter()
+        recyclerView.adapter = adapter
 
+        val imageButton: ImageButton = view.findViewById(R.id.imageButton)
+        imageButton.setOnClickListener {
+            showAddItemDialog()
+        }
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+    }
+
+    private fun showAddItemDialog() {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_checklist_item, null)
+        val editText = dialogView.findViewById<EditText>(R.id.editTextChecklistItem)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("체크리스트 항목 추가")
+            .setView(dialogView)
+            .setPositiveButton("저장") { dialog, which ->
+                val itemText = editText.text.toString()
+                if (itemText.isNotEmpty()) {
+                    adapter.addItem(itemText)
+                }
+            }
+            .setNegativeButton("취소", null)
+            .show()
     }
 
 
@@ -113,27 +140,9 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         }
     }
 
-    private fun checkPermissionAndPickImage() {
-        when {
-            ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                pickImageFromGallery()
-            }
-            shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
-                // 권한에 대한 추가적인 설명을 제공하고, 권한 요청을 다시 시도할 수 있습니다.
-            }
-            else -> {
-                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-        }
-    }
-
-
     private fun pickImageFromGallery() {
         pickImageLauncher.launch("image/*")
     }
-
 
     companion object {
         private const val PERMISSION_REQUEST_READ_STORAGE = 101

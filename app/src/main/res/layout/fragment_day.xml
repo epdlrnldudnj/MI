@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -17,11 +19,7 @@
     <!-- 다른 뷰들을 포함하는 레이아웃 -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="589dp">
-
-        <!-- 상단 날짜 표시 -->
-
-        <!-- 오늘의 할 일 제목 -->
+        android:layout_height="600dp">
 
         <TextView
             android:id="@+id/textDate"
@@ -29,8 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
 
-            android:layout_marginLeft="200dp"
-            android:layout_marginTop="98dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="90dp"
             android:text="Date "
             android:textSize="18sp" />
 
@@ -39,54 +37,88 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="250dp"
-            android:layout_marginTop="98dp"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="90dp"
             android:text="2023.11.12"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
-            android:id="@+id/tvTodoTitle"
+
+        <LinearLayout
+            android:id="@+id/todolist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/dayDate"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="4dp"
-            android:text="오늘의 할 일"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_marginRight="20dp"
+            android:orientation="vertical"
+            android:padding="0dp"
+            >
 
-        <!-- 오늘의 할 일 입력창 -->
+            <TextView
+                android:id="@+id/tvTodoTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-        <EditText
-            android:id="@+id/etTodo"
-            android:layout_width="match_parent"
-            android:layout_height="100sp"
-            android:layout_below="@id/tvTodoTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/box_background"
-            android:drawablePadding="10dp"
-            android:gravity="center_vertical"
-            android:padding="10dp" />
+                android:layout_marginTop="4dp"
+                android:text="오늘의 할 일"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <!-- 오늘의 할 일 입력창 -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/Todo"
+                android:layout_width="300dp"
+                android:layout_height="100dp"
+                android:layout_below="@id/tvTodoTitle"
+                android:background="@drawable/box_background"
+
+                >
+
+                <!-- RecyclerView 정의 -->
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:padding="0dp"
+                    />
+
+
+
+
+                <ImageButton
+                    android:id="@+id/imageButton"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="?android:selectableItemBackground"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/plus"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/photobox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/etTodo"
+            android:layout_below="@id/todolist"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginRight="30dp"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginRight="2dp">
 
                 <TextView
                     android:id="@+id/tvPhotoTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="22dp"
                     android:text="오늘의 한 컷"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -98,33 +130,37 @@
                     android:layout_marginTop="7dp"
                     android:background="@drawable/camera"
                     android:padding="10dp"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    android:tag="" />
             </LinearLayout>
+
             <EditText
                 android:id="@+id/photostory"
-                android:layout_width="200dp"
-                android:layout_height="100dp"
+                android:layout_width="188dp"
+                android:layout_height="match_parent"
                 android:layout_below="@id/tvJournalTitle"
+                android:layout_marginRight="5dp"
+
                 android:layout_marginTop="32dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/box_background"
-                />
+                android:background="@drawable/box_background" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_below="@id/photobox"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
-            >
-                <!-- 장기목표 입력창 -->
+            android:layout_marginRight="20dp"
+
+            android:orientation="horizontal">
+            <!-- 장기목표 입력창 -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/tvJournalTitle"
                     android:layout_width="wrap_content"
@@ -135,39 +171,54 @@
 
                 <EditText
                     android:id="@+id/etJournal"
-                    android:layout_width="200dp"
+                    android:layout_width="191dp"
                     android:layout_height="100dp"
                     android:layout_below="@id/tvJournalTitle"
                     android:layout_marginTop="8dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@drawable/box_background"
-                    />
+                    android:layout_marginRight="2dp"
+                    android:background="@drawable/box_background" />
+
+
+
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                    <!-- 오늘의 기분 제목 -->
+                <!-- 오늘의 기분 제목 -->
                 <TextView
                     android:id="@+id/tvMoodTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="오늘의 기분"
-                    />
-                    <!-- 오늘의 기분 추가 버튼들 -->
-                    <ImageButton
-                        android:id="@+id/btnMoodBox"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="8dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!-- 오늘의 기분 추가 버튼들 -->
+                <ImageButton
+                    android:id="@+id/btnMoodBox"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="8dp"
 
-                        android:background="@drawable/box_background"
-                        android:padding="10dp"
-                        android:scaleType="fitCenter"
-                        />
+                    android:background="@drawable/box_background"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter" />
 
             </LinearLayout>
+
         </LinearLayout>
+
+        <Button
+            android:id="@+id/Savebtn"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/box"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="140dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="140dp"
+            android:text="저장" />
+
     </RelativeLayout>
 </FrameLayout>

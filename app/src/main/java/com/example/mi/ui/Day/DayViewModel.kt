@@ -10,8 +10,6 @@ import java.time.LocalDate
 @RequiresApi(Build.VERSION_CODES.O)
 class DayViewModel : ViewModel() {
     private val _currentDate = MutableLiveData<LocalDate>()
-    val currentDate: LiveData<LocalDate> get() = _currentDate
-
     init {
         getCurrentDate()
     }
