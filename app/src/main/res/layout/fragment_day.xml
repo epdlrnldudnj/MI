@@ -125,19 +125,32 @@
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:padding="10dp" />
-        </LinearLayout>
-                <!-- 오늘의 기분 제목 -->
-
-                <!-- 오늘의 기분 추가 버튼들 -->
-
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                    <!-- 오늘의 기분 제목 -->
                 <TextView
                     android:id="@+id/tvMoodTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="오늘의 기분"
-                    android:textAppearance="@style/CalendarDateStyle"
-                     />
+                    />
+                    <!-- 오늘의 기분 추가 버튼들 -->
+                    <ImageButton
+                        android:id="@+id/btnMoodBox"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_below="@id/tvMoodTitle"
+
+                        android:background="@drawable/box_background"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter"
+                    />
+
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </FrameLayout>
