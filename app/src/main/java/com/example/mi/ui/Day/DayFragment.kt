@@ -1,13 +1,22 @@
 package com.example.mi.ui.Day
 
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
 import java.time.format.DateTimeFormatter
@@ -15,6 +24,7 @@ import java.time.format.DateTimeFormatter
 class DayFragment : Fragment(R.layout.fragment_day) {
     private val dayViewModel: DayViewModel by viewModels()
     private var binding: FragmentDayBinding? = null
+    private lateinit var pickImageLauncher: ActivityResultLauncher<String>
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,6 +36,16 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         })
         binding?.btnMoodBox?.setOnClickListener {
             showMoodSelector()
+        }
+        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                // Use the uri to load the image into the ImageView
+                binding?.btnAddPhoto?.setImageURI(uri)
+            }
+        }
+
+        binding?.btnAddPhoto?.setOnClickListener {
+            pickImageFromGallery()
         }
 
 
@@ -61,4 +81,41 @@ class DayFragment : Fragment(R.layout.fragment_day) {
                 else -> R.drawable.check
             }
         }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImageFromGallery()
+        } else {
+            Toast.makeText(context, "권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun checkPermissionAndPickImage() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                pickImageFromGallery()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                // 권한에 대한 추가적인 설명을 제공하고, 권한 요청을 다시 시도할 수 있습니다.
+            }
+            else -> {
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+    }
+
+
+    private fun pickImageFromGallery() {
+        pickImageLauncher.launch("image/*")
+    }
+
+
+    companion object {
+        private const val PERMISSION_REQUEST_READ_STORAGE = 101
+        private const val PICK_IMAGE_REQUEST = 102
+    }
 }

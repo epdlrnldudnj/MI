@@ -71,7 +71,7 @@
 
         <LinearLayout
             android:id="@+id/photobox"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/etTodo"
             android:layout_marginLeft="30dp"
@@ -90,14 +90,15 @@
                     android:text="오늘의 한 컷"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/btnAddPhoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_below="@id/tvPhotoTitle"
                     android:layout_marginTop="7dp"
                     android:background="@drawable/camera"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:scaleType="centerCrop" />
             </LinearLayout>
             <EditText
                 android:id="@+id/photostory"
