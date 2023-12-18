@@ -86,12 +86,12 @@
 
     <ImageButton
         android:id="@+id/btnLogout"
-        android:layout_width="52dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/storage_button"
-        app:srcCompat="@drawable/check" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/logout"
+        app:layout_constraintEnd_toEndOf="@+id/storage_button"
+        app:layout_constraintTop_toBottomOf="@+id/storage_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
