@@ -48,7 +48,7 @@ class StoragePage : AppCompatActivity() {
 
         val returnButton: Button = binding.button
         returnButton.setOnClickListener {
-            val intent = Intent(this, IslandViewModel::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 

@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.databinding.ActivityShoppingPageBinding
-import com.example.mi.ui.dashboard.IslandFragment
 import com.example.mi.ui.dashboard.IslandViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -45,7 +44,7 @@ class ShoppingPage : AppCompatActivity() {
 
         val returnButton: Button = binding.button
         returnButton.setOnClickListener {
-            val intent = Intent(this, IslandViewModel::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
