@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -46,7 +47,7 @@ class StoragePage : AppCompatActivity() {
         db = Firebase.firestore
         currentUser = auth.currentUser!!
 
-        val returnButton: Button = binding.button
+        val returnButton: ImageButton = binding.button
         returnButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
