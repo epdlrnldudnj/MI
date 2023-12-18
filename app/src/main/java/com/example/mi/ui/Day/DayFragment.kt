@@ -25,8 +25,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -57,10 +61,21 @@ class DayFragment : Fragment(R.layout.fragment_day) {
     }
 
     private fun updateDateTime() {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val dateTimeString = dateFormat.format(Date())
-        binding?.dayDate?.text = dateTimeString
+        // 'selectedDate'가 null이면 현재 날짜를 사용합니다.
+        val selectedDate = arguments?.getString("selectedDate") ?: getCurrentDate()
+
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        try {
+            val parsedDate = dateFormat.parse(selectedDate)
+            val dateTimeString = dateFormat.format(parsedDate)
+            binding?.dayDate?.text = dateTimeString
+        } catch (e: ParseException) {
+            // 날짜 파싱 실패 처리
+            Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show()
+        }
     }
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +83,9 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         binding = FragmentDayBinding.bind(view)
         database = FirebaseDatabase.getInstance().getReference("days")
         handler.post(updateRunnable)
-// Bundle에서 선택된 날짜를 가져옵니다.
+        updateDateTime()
+        val currentDate = arguments?.getString("selectedDate") ?: getCurrentDate()
+        // Bundle에서 선택된 날짜를 가져옵니다.
         val selectedDate = arguments?.getString("selectedDate")
 
         // 선택된 날짜를 사용하여 UI 업데이트
@@ -109,12 +126,14 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         }
         rvGoal.layoutManager = LinearLayoutManager(context)
     }
+    private fun getCurrentDate(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return dateFormat.format(Date())
+    }
     private fun updateUIForSelectedDate(date: String?) {
         // 선택된 날짜에 대한 UI 업데이트 로직
         // 예: 선택된 날짜를 텍스트 뷰에 표시
-        date?.let {
-            binding?.dayDate?.text = it
-        }
+        binding?.dayDate?.text = date
     }
 
     private fun showAddGoalDialog() {
@@ -239,4 +258,45 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         private const val PERMISSION_REQUEST_READ_STORAGE = 101
         private const val PICK_IMAGE_REQUEST = 102
     }
+    private fun saveData(date: String, data: DayData) {
+        database.child(date).setValue(data)
+            .addOnSuccessListener {
+                // 데이터 저장 성공 처리
+                Toast.makeText(context, "Data saved successfully", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                // 데이터 저장 실패 처리
+                Toast.makeText(context, "Failed to save data", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun loadData(date: String) {
+        database.child(date).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val data = dataSnapshot.getValue(DayData::class.java)
+                // 데이터 불러오기 성공, UI 업데이트
+                updateUI(data)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // 데이터 불러오기 실패 처리
+                Toast.makeText(context, "Failed to load data", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun updateUI(data: DayData?) {
+        data?.let {
+            // 예: 텍스트뷰, 이미지뷰 업데이트
+            //binding.textView.text = it.text
+            //binding.imageView.loadImage(it.imageUrl) // 이미지 로드 함수는 별도 구현 필요
+            // 기타 UI 업데이트
+        }
+    }
+    data class DayData(
+        val text: String? = null,
+        val imageUrl: String? = null,
+        val mood: String? = null
+        // 기타 필요한 필드를 추가할 수 있습니다.
+    )
 }
