@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -39,6 +41,8 @@ class DayFragment : Fragment(R.layout.fragment_day) {
     private lateinit var rvGoal: RecyclerView
     private lateinit var goalAdapter: GoalAdapter
     private val goalsList: MutableList<Goal> = mutableListOf()
+
+    private lateinit var database: DatabaseReference
 
     private val updateRunnable = object : Runnable {
         override fun run() {
@@ -62,7 +66,13 @@ class DayFragment : Fragment(R.layout.fragment_day) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDayBinding.bind(view)
+        database = FirebaseDatabase.getInstance().getReference("days")
         handler.post(updateRunnable)
+// Bundle에서 선택된 날짜를 가져옵니다.
+        val selectedDate = arguments?.getString("selectedDate")
+
+        // 선택된 날짜를 사용하여 UI 업데이트
+        updateUIForSelectedDate(selectedDate)
 
         binding?.btnMoodBox?.setOnClickListener {
             showMoodSelector()
@@ -98,6 +108,13 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             showAddGoalDialog()
         }
         rvGoal.layoutManager = LinearLayoutManager(context)
+    }
+    private fun updateUIForSelectedDate(date: String?) {
+        // 선택된 날짜에 대한 UI 업데이트 로직
+        // 예: 선택된 날짜를 텍스트 뷰에 표시
+        date?.let {
+            binding?.dayDate?.text = it
+        }
     }
 
     private fun showAddGoalDialog() {
