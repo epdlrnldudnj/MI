@@ -17,6 +17,14 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/shoppingbutton"
         app:layout_constraintTop_toTopOf="@+id/shoppingbutton" />
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toStartOf="@+id/piece"
+        app:layout_constraintTop_toTopOf="@+id/piece"
+        android:layout_marginTop="-10dp"
+        app:srcCompat="@drawable/mindpiece" />
 
     <ImageButton
         android:id="@+id/shoppingbutton"
@@ -84,5 +92,7 @@
         android:background="@drawable/logout"
         app:layout_constraintEnd_toEndOf="@+id/storage_button"
         app:layout_constraintTop_toBottomOf="@+id/storage_button" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
