@@ -92,14 +92,14 @@ class SignUpActivity : AppCompatActivity() {
 
         for (i in 1..count) {
             val flowerData = hashMapOf(
-                "name" to "flower_$i",
+                "name" to "flower_${i.toString().padStart(2,'0')}",
                 "price" to 50,
                 "status" to 0,
                 "x" to 0,
                 "y" to 0
             )
 
-            val flowerDocumentName = "flower_$i"
+            val flowerDocumentName = "flower_${i.toString().padStart(2,'0')}"
 
             db.collection("users").document(uid)
                 .collection("FlowerList").document(flowerDocumentName)

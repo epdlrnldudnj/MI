@@ -10,7 +10,7 @@
         android:id="@+id/imageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/flower_1" />
+        android:src="@drawable/flower_01" />
 
     <LinearLayout
         android:layout_width="100dp"
@@ -28,7 +28,7 @@
             android:id="@+id/buyButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="구매하기"
+            android:text=""
             />
 
     </LinearLayout>
