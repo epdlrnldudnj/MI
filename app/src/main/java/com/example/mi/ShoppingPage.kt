@@ -42,7 +42,6 @@ class ShoppingPage : AppCompatActivity() {
         // Initialize Firebase instances
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
-        R.drawable.flower_01
 
         val returnButton: Button = binding.button
         returnButton.setOnClickListener {
@@ -86,9 +85,6 @@ class ShoppingPage : AppCompatActivity() {
                 }
         }
     }
-
-
-
 
     class FlowerAdapter(private val flowers: MutableList<Flowers>) :
         RecyclerView.Adapter<FlowerViewHolder>() {
