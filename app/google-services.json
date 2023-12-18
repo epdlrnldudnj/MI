@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "577237518455",
+    "project_id": "myisland-1dbb6",
+    "storage_bucket": "myisland-1dbb6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577237518455:android:e9da1142dec58e276e5e72",
+        "android_client_info": {
+          "package_name": "com.example.mi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "577237518455-9jv9cbuvg83fahnut1824cp2mj93kanj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mi",
+            "certificate_hash": "526dbeae13d994c15440af57e3ef91d151bd8777"
+          }
+        },
+        {
+          "client_id": "577237518455-q2us74f9abim6kkfs7ls95bjrhse0rhv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXQhkQ2JpGFQozYcGHZwCZfB445F4BmeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "577237518455-q2us74f9abim6kkfs7ls95bjrhse0rhv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

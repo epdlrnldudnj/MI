@@ -10,24 +10,24 @@
         android:id="@+id/testbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="32dp"
         android:text="Button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/piece"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
         android:text=""
         android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/shopping_button"
-        app:layout_constraintTop_toTopOf="@+id/shopping_button" />
+        app:layout_constraintEnd_toStartOf="@+id/shoppingbutton"
+        app:layout_constraintTop_toTopOf="@+id/shoppingbutton" />
 
     <ImageButton
-        android:id="@+id/shopping_button"
+        android:id="@+id/shoppingbutton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
@@ -42,8 +42,8 @@
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/storage_button"
-        app:layout_constraintEnd_toEndOf="@+id/shopping_button"
-        app:layout_constraintTop_toBottomOf="@+id/shopping_button" />
+        app:layout_constraintEnd_toEndOf="@+id/shoppingbutton"
+        app:layout_constraintTop_toBottomOf="@+id/shoppingbutton" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -83,4 +83,14 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnLogout"
+        android:layout_width="52dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/storage_button"
+        app:srcCompat="@drawable/check" />
 </androidx.constraintlayout.widget.ConstraintLayout>
