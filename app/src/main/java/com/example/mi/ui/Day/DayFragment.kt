@@ -1,5 +1,6 @@
 package com.example.mi.ui.Day
 
+import android.content.ContentValues.TAG
 import android.app.DatePickerDialog
 import android.graphics.Rect
 import android.os.Build
@@ -25,11 +26,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -45,6 +48,8 @@ class DayFragment : Fragment(R.layout.fragment_day) {
     private lateinit var rvGoal: RecyclerView
     private lateinit var goalAdapter: GoalAdapter
     private val goalsList: MutableList<Goal> = mutableListOf()
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     private lateinit var database: DatabaseReference
 
@@ -74,6 +79,16 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show()
         }
     }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // FirebaseAuth 인스턴스 초기화
+        auth = FirebaseAuth.getInstance()
+        // FirebaseFirestore 인스턴스 초기화
+        db = FirebaseFirestore.getInstance()
+        // FirebaseDatabase 인스턴스 초기화 (필요한 경우)
+        database = FirebaseDatabase.getInstance().getReference("days")
+    }
+
 
 
 
@@ -83,6 +98,14 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         binding = FragmentDayBinding.bind(view)
         database = FirebaseDatabase.getInstance().getReference("days")
         handler.post(updateRunnable)
+
+        /// FirebaseAuth 인스턴스 초기화
+        auth = FirebaseAuth.getInstance()
+        // FirebaseFirestore 인스턴스 초기화
+        db = FirebaseFirestore.getInstance()
+        // FirebaseDatabase 인스턴스 초기화 (필요한 경우)
+        database = FirebaseDatabase.getInstance().getReference("days")
+
         updateDateTime()
         val currentDate = arguments?.getString("selectedDate") ?: getCurrentDate()
         // Bundle에서 선택된 날짜를 가져옵니다.
@@ -96,6 +119,7 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         }
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
+                updateMindPiece(10)
                 binding?.btnAddPhoto?.setImageURI(uri)
             }
         }
@@ -185,9 +209,12 @@ class DayFragment : Fragment(R.layout.fragment_day) {
                 val millis = date?.time ?: 0
 
                 if (millis > 0) {
+                    updateMindPiece(10)
+
                     val newGoal = Goal(editTextGoalName, editTextGoalPercentage.toInt(), millis)
                     goalsList.add(newGoal)
                     goalAdapter.notifyDataSetChanged()
+
                     dialog.dismiss() // 다이얼로그 닫기
                 } else {
                     Toast.makeText(context, "유효한 날짜를 선택하세요.", Toast.LENGTH_SHORT).show()
@@ -207,10 +234,12 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             .setTitle("체크리스트 항목 추가")
             .setView(dialogView)
             .setPositiveButton("저장") { dialog, which ->
+                updateMindPiece(10)
                 val itemText = editText.text.toString()
                 if (itemText.isNotEmpty()) {
                     adapter.addItem(itemText)
                 }
+
             }
             .setNegativeButton("취소", null)
             .show()
@@ -223,6 +252,8 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             .setItems(moods) { dialog, which ->
                 val selectedMood = moods[which]
                 binding?.btnMoodBox?.setImageResource(getImageResourceForMood(selectedMood))
+                updateMindPiece(10)
+
             }
             .show()
     }
@@ -238,6 +269,7 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             "체크" -> R.drawable.check
             else -> R.drawable.check
         }
+
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -299,4 +331,38 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         val mood: String? = null
         // 기타 필요한 필드를 추가할 수 있습니다.
     )
+
+    private fun updateMindPiece(how: Int) {
+        val uid = auth.currentUser?.uid
+        uid?.let {
+            // Firestore에서 현재 MindPiece 값을 불러오기
+            db.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null) {
+                        // 현재 MindPiece 값을 가져오기
+                        val currentMindPiece = document.getLong("MindPiece") ?: 0
+
+                        // 증가 혹은 감소된 값을 계산
+                        val updatedMindPiece = currentMindPiece + how
+
+                        // Firestore에 업데이트된 MindPiece 값을 저장
+                        db.collection("users").document(uid)
+                            .update("MindPiece", updatedMindPiece)
+                            .addOnSuccessListener {
+                                // 업데이트 성공 시 TextView에 표시
+                               // binding.piece.text = updatedMindPiece.toString()
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.w(TAG, "Error updating document", exception)
+                            }
+                    } else {
+                        Log.d(TAG, "No such document")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
+                }
+        }
+    }
 }
