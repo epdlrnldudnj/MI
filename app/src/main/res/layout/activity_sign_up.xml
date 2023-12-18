@@ -33,4 +33,14 @@
         android:layout_marginTop="16dp"
         android:text="Sign Up"/>
 
+    <Button
+        android:id="@+id/btnGoToLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSignUp"
+        android:layout_alignStart="@+id/btnSignUp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:text="Login" />
+
 </RelativeLayout>
