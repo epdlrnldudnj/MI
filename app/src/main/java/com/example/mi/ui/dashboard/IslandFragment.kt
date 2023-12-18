@@ -46,12 +46,7 @@ class IslandFragment : Fragment() {
         // Firebase Authentication 인스턴스 초기화
         auth = FirebaseAuth.getInstance()
 
-        // 버튼과 텍스트뷰 찾기
-        val testButton: Button = binding.testbutton
 
-        testButton.setOnClickListener {
-            updateMindPiece(10)
-        }
 
         auth = Firebase.auth
         db = FirebaseFirestore.getInstance()
