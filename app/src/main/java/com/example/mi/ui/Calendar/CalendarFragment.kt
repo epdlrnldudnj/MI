@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mi.databinding.FragmentCalendarBinding
+import java.time.LocalDate
 
 
 class CalendarFragment : Fragment() {
@@ -33,7 +35,14 @@ class CalendarFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupCalendar() {
-        val daysAdapter = DaysAdapter(viewModel.getDaysInMonthArray())
+        val daysAdapter = DaysAdapter(viewModel.getDaysInMonthArray(), object : DaysAdapter.OnDayClickListener {
+            override fun onDayClick(date: LocalDate?) {
+                // 날짜 클릭 시 실행할 동작
+                date?.let {
+                    Toast.makeText(context, "Selected date: ${it.toString()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
         binding.recyclerViewCalendar.apply {
             layoutManager = GridLayoutManager(requireContext(), 7)
             adapter = daysAdapter
@@ -51,6 +60,17 @@ class CalendarFragment : Fragment() {
             updateCalendar(daysAdapter)
         }
     }
+    interface OnDayClickListener {
+        fun onDayClick(date: LocalDate?)
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun onDayClick(date: LocalDate?) {
+        date?.let {
+            Toast.makeText(context, "Selected date: ${it.toString()}", Toast.LENGTH_SHORT).show()
+            // 여기에 추가적인 처리를 할 수 있습니다.
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateCalendar(daysAdapter: DaysAdapter) {
@@ -68,4 +88,5 @@ class CalendarFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

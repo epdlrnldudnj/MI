@@ -110,7 +110,7 @@
                    android:textStyle="bold"
                    android:textColor="@color/red"
                    android:padding="4dp"
-                   android:layout_marginLeft="18dp"
+                   android:layout_marginLeft="14dp"
                    android:layout_marginRight="10dp"
                    />
 
