@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_dashboard">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.example.mi.ui.Calender.CalendarFragment"
-        android:label="@string/main_calender"
-        tools:layout="@layout/fragment_calender" />
+        android:id="@+id/navigation_calendar"
+        android:name="com.example.mi.ui.Calendar.CalendarFragment"
+        android:label="@string/main_calendar"
+        tools:layout="@layout/fragment_calendar" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -18,7 +18,7 @@
         tools:layout="@layout/fragment_island" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_day"
         android:name="com.example.mi.ui.Day.DayFragment"
         android:label="@string/main_day"
         tools:layout="@layout/fragment_day" />

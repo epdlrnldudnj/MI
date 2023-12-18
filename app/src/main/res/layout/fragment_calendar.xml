@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_background"
+    android:padding="16dp">
+
+    <!-- 요일 헤더를 표시하는 LinearLayout -->
+       <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/circle_background"
+            android:gravity="center"
+           > <!-- 월 TextView 아래에 위치하도록 마진 설정 -->
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               >
+
+               <ImageButton
+                   android:id="@+id/pre_btn"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:src="@drawable/calender_left"
+                   android:layout_weight="1"/>
+
+               <TextView
+                   android:id="@+id/textViewMonthYear"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:gravity="center"
+                   android:text="December 2023"
+                   android:textSize="25dp"
+                   android:layout_weight="2"/>
+               <ImageButton
+                   android:id="@+id/next_btn"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:src="@drawable/calender_right"
+                   android:layout_weight="1"/>
+           </LinearLayout>
+            <!-- 각 요일을 표시하는 TextView들 -->
+           <LinearLayout
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:layout_gravity="center"
+               android:layout_marginTop="8dp"
+               >
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Mon"
+                   android:textStyle="bold"
+                   android:padding="4dp"
+                   android:layout_marginLeft="10dp"
+
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Tue"
+                   android:textStyle="bold"
+                   android:padding="4dp"
+                   android:layout_marginLeft="18dp"
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Wed"
+                   android:textStyle="bold"
+                   android:padding="4dp"
+                   android:layout_marginLeft="18dp"
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Thu"
+                   android:textStyle="bold"
+                   android:padding="4dp"
+                   android:layout_marginLeft="18dp"
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Fri"
+                   android:textStyle="bold"
+                   android:padding="4dp"
+                   android:layout_marginLeft="18dp"
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Sat"
+                   android:textStyle="bold"
+                   android:textColor="@color/blue"
+                   android:padding="4dp"
+                   android:layout_marginLeft="18dp"
+
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Sun"
+                   android:textStyle="bold"
+                   android:textColor="@color/red"
+                   android:padding="4dp"
+                   android:layout_marginLeft="14dp"
+                   android:layout_marginRight="10dp"
+                   />
+
+
+           </LinearLayout>
+
+        <!-- 달력 날짜를 표시하는 RecyclerView -->
+           <androidx.recyclerview.widget.RecyclerView
+               android:id="@+id/recyclerViewCalendar"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:clipToPadding="false"
+               android:paddingBottom="16dp"
+               android:layout_marginLeft="15dp"
+               android:layout_marginRight="5dp"
+               />
+       </LinearLayout>
+
+</FrameLayout>

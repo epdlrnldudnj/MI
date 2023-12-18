@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -16,114 +19,228 @@
     <!-- 다른 뷰들을 포함하는 레이아웃 -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="589dp">
+        android:layout_height="600dp">
 
-        <!-- 상단 날짜 표시 -->
         <TextView
-            android:id="@+id/Date"
+            android:id="@+id/textDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="220dp"
-            android:layout_marginTop="100dp"
-            android:text="Date 2023.11.12"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <!-- 오늘의 할 일 제목 -->
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="90dp"
+            android:text="Date "
+            android:textSize="18sp" />
+
         <TextView
-            android:id="@+id/tvTodoTitle"
+            android:id="@+id/dayDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Date"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="24dp"
-            android:text="오늘의 할 일"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="90dp"
+            android:text="2023.11.12"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <!-- 오늘의 할 일 입력창 -->
-        <EditText
-            android:id="@+id/etTodo"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/tvTodoTitle"
+
+        <LinearLayout
+            android:id="@+id/todolist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dayDate"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical"
+            android:padding="0dp"
+            >
+
+            <TextView
+                android:id="@+id/tvTodoTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="4dp"
+                android:text="오늘의 할 일"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <!-- 오늘의 할 일 입력창 -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/Todo"
+                android:layout_width="300dp"
+                android:layout_height="100dp"
+                android:layout_below="@id/tvTodoTitle"
+                android:background="@drawable/box_background"
+
+                >
+
+                <!-- RecyclerView 정의 -->
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:padding="0dp"
+                    />
+
+
+
+
+                <ImageButton
+                    android:id="@+id/imageButton"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="?android:selectableItemBackground"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/plus"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/photobox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/todolist"
+            android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:background="@drawable/addtodayworks"
-            android:drawablePadding="10dp"
-            android:gravity="center_vertical"
-            android:padding="10dp" />
+            android:orientation="horizontal">
 
-        <!-- 오늘의 한 컷 제목 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginRight="2dp">
 
-        <!-- 이미지 추가 버튼 -->
+                <TextView
+                    android:id="@+id/tvPhotoTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="22dp"
+                    android:text="오늘의 한 컷"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <!-- 장기목표 기록 제목 -->
-        <TextView
-            android:id="@+id/tvPhotoTitle"
+                <ImageView
+                    android:id="@+id/btnAddPhoto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_below="@id/tvPhotoTitle"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/camera"
+                    android:padding="10dp"
+                    android:scaleType="centerCrop"
+                    android:tag="" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/photostory"
+                android:layout_width="188dp"
+                android:layout_height="match_parent"
+                android:text="Photo story"
+                android:textStyle="italic"
+                android:gravity="top|start"
+                android:layout_below="@id/tvJournalTitle"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/box_background" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/etTodo"
+            android:layout_below="@id/photobox"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="13dp"
-            android:text="오늘의 한 컷"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
 
-        <ImageButton
-            android:id="@+id/btnAddPhoto"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_below="@id/tvPhotoTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="7dp"
-            android:background="@drawable/camera"
-            android:padding="10dp" />
+            android:orientation="horizontal">
+            <!-- 장기목표 입력창 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <!-- 장기목표 입력창 -->
-        <TextView
-            android:id="@+id/tvJournalTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btnAddPhoto"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="11dp"
-            android:text="장기목표기록"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/tvJournalTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-        <EditText
-            android:id="@+id/etJournal"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/tvJournalTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/day_icon"
-            android:drawablePadding="10dp"
-            android:gravity="center_vertical"
-            android:padding="10dp" />
+                    android:text="장기목표기록"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <!-- 오늘의 기분 제목 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/goal"
+                    android:layout_width="200dp"
+                    android:layout_height="100dp"
+                    android:layout_below="@id/tvTodoTitle"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/box_background"
 
-        <!-- 오늘의 기분 추가 버튼들 -->
-        <TextView
-            android:id="@+id/tvMoodTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/etJournal"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="11dp"
-            android:text="오늘의 기분"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    >
 
-        <ImageButton
-            android:id="@+id/btnMoodHappy"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_below="@id/tvMoodTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/joy"
-            android:padding="10dp" />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvgoal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="0dp"
+                        android:scrollbars="vertical" />
+
+
+                    <ImageButton
+                        android:id="@+id/goalbutton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="?android:selectableItemBackground"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/plus"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- 오늘의 기분 제목 -->
+                <TextView
+                    android:id="@+id/tvMoodTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="오늘의 기분"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!-- 오늘의 기분 추가 버튼들 -->
+                <ImageButton
+                    android:id="@+id/btnMoodBox"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="8dp"
+
+                    android:background="@drawable/box_background"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSetGoal"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/box"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="140dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="140dp"
+            android:text="저장" />
+
     </RelativeLayout>
 </FrameLayout>

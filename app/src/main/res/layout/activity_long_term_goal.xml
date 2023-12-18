@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/tvGoalProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="목표 입력" />
+
+    <EditText
+        android:id="@+id/etGoalPercentage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="진행도 설정"
+        android:inputType="numberDecimal" />
+
+    <Button
+        android:id="@+id/btnSetEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="종료일 설정" />
+</LinearLayout>
