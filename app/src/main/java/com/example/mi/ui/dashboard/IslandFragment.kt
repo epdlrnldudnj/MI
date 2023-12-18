@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -49,7 +48,6 @@ class IslandFragment : Fragment() {
 
         // 버튼과 텍스트뷰 찾기
         val testButton: Button = binding.testbutton
-        val pieceText: TextView = binding.piece
 
         testButton.setOnClickListener {
             updateMindPiece(10)
@@ -59,9 +57,9 @@ class IslandFragment : Fragment() {
         db = FirebaseFirestore.getInstance()
 
         loadData()
+        loadFlowers()
 
         val shoppingButton: ImageButton = binding.shoppingbutton
-
         shoppingButton.setOnClickListener {
             val intent = Intent(requireContext(), ShoppingPage::class.java)
             startActivity(intent)
@@ -75,7 +73,6 @@ class IslandFragment : Fragment() {
 
         // 로그아웃 버튼 처리
         val logoutButton: ImageButton = binding.btnLogout
-
         logoutButton.setOnClickListener {
             // Firebase Authentication을 이용한 로그아웃
             auth.signOut()
@@ -149,22 +146,28 @@ class IslandFragment : Fragment() {
                 }
         }
     }
-    private fun addFlowerImage(flower: Flower) {
+    private fun addFlowerImage(flower: Flower, x: Number, y:Number) {
         val imageView = ImageView(requireContext())
+        val width = 200
+        val height = 300
         imageView.setImageResource(flower.imageId)
-        imageView.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        imageView.layoutParams = ViewGroup.LayoutParams(width, height)
 
         // 이미지뷰에 드래그 가능한 기능 추가
         imageView.setOnTouchListener { view, motionEvent ->
             handleDrag(view, motionEvent, flower)
         }
 
+        // Firebase에서 가져온 x, y 좌표 설정
+        val initialX = x.toFloat() // 이 값은 Firebase에서 가져와야 합니다.
+        val initialY = y.toFloat() // 이 값은 Firebase에서 가져와야 합니다.
+        imageView.x = initialX
+        imageView.y = initialY
+
         // 이미지뷰를 IslandFragment에 추가
-        binding.islandLayout.addView(imageView)
+        binding.constraintLayout.addView(imageView)
     }
+
 
     private fun handleDrag(view: View, motionEvent: MotionEvent, flower: Flower): Boolean {
         when (motionEvent.action) {
@@ -209,7 +212,9 @@ class IslandFragment : Fragment() {
                         val imageName = document.getString("name") ?: ""
                         val imageId = resources.getIdentifier(imageName, "drawable", requireContext().packageName)
                         val flower = Flower(imageId, document.id)
-                        addFlowerImage(flower)
+                        val x = document.getDouble("x") ?:0
+                        val y = document.getDouble("y") ?:0
+                        addFlowerImage(flower,x,y)
                     }
                 }
                 .addOnFailureListener { exception ->
