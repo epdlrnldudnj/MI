@@ -138,11 +138,14 @@
                 android:id="@+id/photostory"
                 android:layout_width="188dp"
                 android:layout_height="match_parent"
+                android:text="Photo story"
+                android:textStyle="italic"
+                android:gravity="top|start"
                 android:layout_below="@id/tvJournalTitle"
                 android:layout_marginRight="5dp"
-
                 android:layout_marginTop="32dp"
                 android:background="@drawable/box_background" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -169,16 +172,35 @@
                     android:text="장기목표기록"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <EditText
-                    android:id="@+id/etJournal"
-                    android:layout_width="191dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/goal"
+                    android:layout_width="200dp"
                     android:layout_height="100dp"
-                    android:layout_below="@id/tvJournalTitle"
+                    android:layout_below="@id/tvTodoTitle"
                     android:layout_marginTop="8dp"
-                    android:layout_marginRight="2dp"
-                    android:background="@drawable/box_background" />
+                    android:background="@drawable/box_background"
+
+                    >
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvgoal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="0dp"
+                        android:scrollbars="vertical" />
 
 
+                    <ImageButton
+                        android:id="@+id/goalbutton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="?android:selectableItemBackground"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/plus"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -209,7 +231,7 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/Savebtn"
+            android:id="@+id/btnSetGoal"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:layout_below="@id/box"

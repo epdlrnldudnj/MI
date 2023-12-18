@@ -11,7 +11,7 @@ class TodoAdapter(private var items: List<TodoItem>) : RecyclerView.Adapter<Todo
 
     // ViewHolder 클래스
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        // 뷰 바인딩 설정 (예: TextView, CheckBox)
+        // 뷰 바인딩 설정 (예:extView, CheckBox)
         val textView: TextView = view.findViewById(R.id.Todo)
         // ... 기타 뷰 ...
     }
