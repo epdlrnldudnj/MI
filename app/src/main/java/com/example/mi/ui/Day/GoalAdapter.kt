@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mi.R
 import java.util.Calendar
 
-class GoalAdapter(private val goals: List<Goal>) : RecyclerView.Adapter<GoalAdapter.GoalViewHolder>() {
+class GoalAdapter(private var goals: List<Goal>) : RecyclerView.Adapter<GoalAdapter.GoalViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GoalViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_goal, parent, false)
@@ -39,6 +39,13 @@ class GoalAdapter(private val goals: List<Goal>) : RecyclerView.Adapter<GoalAdap
         val dDayInMillis = endDate - today
         return (dDayInMillis / (24 * 60 * 60 * 1000)).toInt() // 일수로 변환
     }
+
+
+    fun updateGoals(newGoals: List<Goal>) {
+        goals = newGoals.toList() // goals 변수를 새 목표 리스트로 대체
+        notifyDataSetChanged() // 어댑터에게 데이터 변경을 알림
+    }
+
 }
 
 data class Goal(

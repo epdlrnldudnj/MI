@@ -39,4 +39,13 @@ class ChecklistAdapter : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
         items.add(item)
         notifyDataSetChanged()
     }
+
+    fun getItems(): List<String> {
+        return items
+    }
+
+    fun updateItems(todos: List<String>) {
+        items = todos.toMutableList()
+        notifyDataSetChanged()
+    }
 }

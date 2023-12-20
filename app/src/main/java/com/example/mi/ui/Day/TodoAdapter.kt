@@ -9,6 +9,13 @@ import com.example.mi.R
 
 class TodoAdapter(private var items: List<TodoItem>) : RecyclerView.Adapter<TodoAdapter.ViewHolder>() {
 
+
+    // 항목 데이터 업데이트 메서드
+    fun updateItems(newItems: List<TodoItem>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
+
     // ViewHolder 클래스
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // 뷰 바인딩 설정 (예:extView, CheckBox)
@@ -28,12 +35,6 @@ class TodoAdapter(private var items: List<TodoItem>) : RecyclerView.Adapter<Todo
     }
 
     override fun getItemCount() = items.size
-
-    // 항목 데이터 업데이트 메서드
-    fun updateItems(newItems: List<TodoItem>) {
-        items = newItems
-        notifyDataSetChanged()
-    }
 }
 
 data class TodoItem(val text: String, val isChecked: Boolean)
