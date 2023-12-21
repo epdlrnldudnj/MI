@@ -9,12 +9,14 @@
     android:paddingBottom="16dp"
     tools:context=".SignUpActivity">
 
+
     <EditText
         android:id="@+id/editTextEmailSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:hint="Email"
-        android:inputType="textEmailAddress"/>
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/editTextPasswordSignUp"
@@ -40,7 +42,7 @@
         android:layout_below="@+id/btnSignUp"
         android:layout_alignStart="@+id/btnSignUp"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:text="Login" />
+        android:layout_marginTop="5dp"
+        android:text="Back to the Login page" />
 
 </RelativeLayout>
