@@ -154,8 +154,8 @@ class IslandFragment : Fragment() {
         }
 
         // Firebase에서 가져온 x, y 좌표 설정
-        val initialX = x.toFloat() // 이 값은 Firebase에서 가져와야 합니다.
-        val initialY = y.toFloat() // 이 값은 Firebase에서 가져와야 합니다.
+        val initialX = x.toFloat()
+        val initialY = y.toFloat()
         imageView.x = initialX
         imageView.y = initialY
 

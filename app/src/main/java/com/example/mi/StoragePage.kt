@@ -2,6 +2,7 @@ package com.example.mi
 
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,7 +31,8 @@ class StoragePage : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var currentUser: FirebaseUser
 
-    data class Flowers(val imageId: Int, var status: Int, val name: String)
+    data class Flowers(val imageId: Int, var status: Int, val name: String, var x: Int = 0, var y: Int = 0)
+
 
     class FlowerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val flowerImage: ImageView = itemView.findViewById(R.id.imageView)
@@ -107,18 +109,13 @@ class StoragePage : AppCompatActivity() {
 
             if (flower.status == 1) {
                 holder.flowerButton.text = "배치하기"
+                holder.flowerButton.setBackgroundColor(Color.parseColor("#548067")) // 버튼 색 변경 예시
             } else if (flower.status == 2) {
                 holder.flowerButton.text = "제거하기"
+                holder.flowerButton.setBackgroundColor(Color.parseColor("#888888")) // 다른 버튼 색으로 변경 예시
             }
 
             holder.flowerButton.setOnClickListener {
-                // 버튼이 눌렸을 때 수행할 동작 추가
-                // 예: 상세 정보 보기, 삭제 등
-                Toast.makeText(
-                    holder.itemView.context,
-                    "상세 정보 보기: ${position + 1}",
-                    Toast.LENGTH_SHORT
-                ).show()
 
                 // 데이터 업데이트
                 val newStatus = if (flower.status == 1) 2 else 1
