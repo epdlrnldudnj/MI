@@ -1,7 +1,12 @@
 package com.example.mi.ui.Day
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -16,17 +21,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
-import com.example.mi.ui.Day.ChecklistAdapter
-import com.example.mi.ui.Day.Goal
-import com.example.mi.ui.Day.GoalAdapter
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -37,9 +38,10 @@ class DayFragment : Fragment() {
     private var selectedImageUri: Uri? = null
     private var selectedMood: String? = null
 
-    private lateinit var database: DatabaseReference
+    private lateinit var dbHelper: MyDatabaseHelper
     private lateinit var goalAdapter: GoalAdapter
     private val goalsList: MutableList<Goal> = mutableListOf()
+
 
     private var _binding: FragmentDayBinding? = null
     private val binding get() = _binding!!
@@ -66,25 +68,24 @@ class DayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = FirebaseDatabase.getInstance().reference
-        val date = getCurrentDate() // 현재 날짜를 가져옴
-        val dataPath = "DayData/$date" // 데이터베이스 경로 설정
+        recyclerView = view.findViewById(R.id.rvItems)
+        adapter = ChecklistAdapter() // 이 부분을 맨 위로 이동
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-// 실제 데이터 객체를 생성하고 해당 경로에 저장
-        val dayData = DayData() // DayData 클래스는 실제 데이터 객체여야 함
-        database.child(dataPath).setValue(dayData)
+        rvGoal = view.findViewById(R.id.rvgoal)
 
+        goalAdapter = GoalAdapter()
+        rvGoal.adapter = goalAdapter
+        rvGoal.layoutManager = LinearLayoutManager(requireContext())
+
+        dbHelper = MyDatabaseHelper(requireContext())
 
         setTodayAsDefaultDate()
         binding.dayDate.setOnClickListener {
             showDatePicker()
         }
         loadDayData(getCurrentDate())
-
-        recyclerView = view.findViewById(R.id.rvItems)
-        adapter = ChecklistAdapter()
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val imageButton: ImageButton = view.findViewById(R.id.imageButton)
         imageButton.setOnClickListener {
@@ -100,11 +101,6 @@ class DayFragment : Fragment() {
         binding.btnAddPhoto.setOnClickListener {
             pickImageFromGallery()
         }
-
-        rvGoal = view.findViewById(R.id.rvgoal)
-        goalAdapter = GoalAdapter(goalsList)
-        rvGoal.adapter = goalAdapter
-        rvGoal.layoutManager = LinearLayoutManager(requireContext())
 
         val goalButton: ImageButton = view.findViewById(R.id.goalbutton)
         goalButton.setOnClickListener {
@@ -144,42 +140,36 @@ class DayFragment : Fragment() {
     }
 
     private fun loadDayData(date: String) {
-        database.child("DayData").child(date).get().addOnSuccessListener { dataSnapshot ->
-            val data = dataSnapshot.getValue(DayData::class.java)
-            if (data != null) {
-                updateUI(data)
-            } else {
-                resetUI()
-            }
-        }.addOnFailureListener { e ->
-            Log.e("DayFragment", "Error loading data", e)
-            Toast.makeText(requireContext(), "Error loading data: ${e.message}", Toast.LENGTH_SHORT).show()
+        val dayData = dbHelper.getDayDataByDate(date)
+        Log.d("DayFragment", "Loading data for date: $date, result: $dayData")
+        if (dayData != null) {
+            updateUI(dayData)
+        } else {
             resetUI()
         }
     }
+    private fun updateUI(dayData: DayData) {
+        adapter.updateItems(dayData.todoList ?: listOf())
+        goalAdapter.updateGoals(dayData.goals ?: listOf())
 
-    private fun updateUI(data: DayData?) {
-        data?.let { dayData ->
-            dayData.todoList?.let { todos ->
-                adapter.updateItems(todos)
-            }
+        Log.d("DayFragment", "Goals JSON: ${dayData.goals}")
 
-            dayData.goals?.let { goals ->
-                goalAdapter.updateGoals(goals)
-            }
-
-            binding.photostory.text = (dayData.photoStory ?: "") as Editable?
-
-            data.photoUri?.let { uri ->
-                Glide.with(this@DayFragment).load(uri).into(binding.btnAddPhoto)
-            }
+        binding.photostory.text = Editable.Factory.getInstance().newEditable(dayData.photoStory ?: "")
+        dayData.photoUri?.let { uri ->
+            Glide.with(this).load(Uri.parse(uri)).into(binding.btnAddPhoto)
         }
     }
 
+
+
     private fun resetUI() {
-        adapter.updateItems(listOf())
-        goalsList.clear()
-        goalAdapter.notifyDataSetChanged()
+        if (::adapter.isInitialized) {
+            adapter.updateItems(listOf())
+        }
+        if (::goalAdapter.isInitialized) {
+            goalsList.clear()
+            goalAdapter.notifyDataSetChanged()
+        }
         binding.photostory.setText("")
         binding.btnMoodBox.setImageResource(R.drawable.check)
         binding.btnAddPhoto.setImageResource(R.drawable.check)
@@ -287,44 +277,140 @@ class DayFragment : Fragment() {
     }
 
     private fun saveDayData() {
-        val date = getCurrentDate()
+        val gson = Gson()
+        val date = binding.dayDate.text.toString()
         val todoList = adapter.getItems()
-        val photoUri = selectedImageUri?.toString() ?: ""
+        val photoUri = selectedImageUri?.toString()
         val photoStory = binding.photostory.text.toString()
-        val goals = goalsList
-        val mood = selectedMood ?: ""
+        val goalsJson = gson.toJson(goalsList) // Goal 객체 목록을 JSON 문자열로 변환합니다.
+        val mood = selectedMood
 
-        val dayData = DayData(
-            date = date,
-            todoList = todoList,
-            photoUri = photoUri,
-            photoStory = photoStory,
-            goals = goals,
-            mood = mood
-        )
-
-        // Firebase에 데이터 저장
-        database.child("DayData").child(date).setValue(dayData)
-            .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Data saved successfully", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Log.e("DayFragment", "Error saving data", e)
-                Toast.makeText(requireContext(), "Failed to save data: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        // JSON 문자열이 아니라, 직렬화된 JSON 문자열을 DayData 객체에 저장합니다.
+        val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
+        val dayDataManager = DayDataManager(requireContext())
+        dayDataManager.saveDayData(dayData)
+        Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        try {
+            val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
+            val dayDataManager = DayDataManager(requireContext())
+            dayDataManager.saveDayData(dayData)
+            Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Log.e("DayFragment", "Error saving day data", e)
+            Toast.makeText(context, "데이터 저장 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+        }
     }
-
-    data class DayData(
-        val date: String? = null,
-        val todoList: List<String>? = null,
-        val photoUri: String? = null,
-        val photoStory: String? = null,
-        val goals: List<Goal>? = null,
-        val mood: String? = null
-    )
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+data class DayData(
+    val date: String,
+    val todoList: List<String>?,
+    val photoUri: String?,
+    val photoStory: String?,
+    val goals: List<Goal>?, // List<Goal> 타입으로 선언
+    val mood: String?
+)
+
+class DayDataManager(private val context: Context) {
+    private val dbHelper = MyDatabaseHelper(context)
+
+    fun saveDayData(dayData: DayData) {
+        // DayData 객체를 데이터베이스에 저장
+        dbHelper.saveDayData(dayData)
+    }
+
+    fun getDayDataByDate(date: String): DayData? {
+        // 주어진 날짜에 해당하는 DayData 객체를 데이터베이스에서 검색
+        return dbHelper.getDayDataByDate(date)
+    }
+}
+
+
+class MyDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+    // 데이터베이스 버전 및 테이블 구조 정의
+    companion object {
+        private const val DATABASE_VERSION = 1
+        private const val DATABASE_NAME = "MyDatabase.db"
+        // ... (기타 필요한 상수 정의)
+    }
+
+    override fun onCreate(db: SQLiteDatabase?) {
+        // 테이블 생성 SQL 문
+        val CREATE_DAY_DATA_TABLE = """
+        CREATE TABLE day_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT,
+            todoList TEXT,
+            photoUri TEXT,
+            photoStory TEXT,
+            goals TEXT,
+            mood TEXT
+        )
+    """.trimIndent()
+
+        // 데이터베이스에 테이블 생성
+        db?.execSQL(CREATE_DAY_DATA_TABLE)
+    }
+
+
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        // 데이터베이스 스키마가 변경되었을 때 기존 테이블을 삭제하고 새로운 테이블을 생성합니다.
+        // 실제 애플리케이션에서는 사용자의 데이터를 보존하기 위해 마이그레이션 로직을 구현해야 할 수 있습니다.
+        db?.execSQL("DROP TABLE IF EXISTS day_data")
+        onCreate(db)
+    }
+
+
+    fun saveDayData(dayData: DayData) {
+        val db = this.writableDatabase
+        val gson = Gson()
+        val contentValues = ContentValues()
+
+        // DayData 객체의 필드를 ContentValues에 채움
+        contentValues.put("date", dayData.date)
+        contentValues.put("todoList", gson.toJson(dayData.todoList))
+        contentValues.put("photoUri", dayData.photoUri)
+        contentValues.put("photoStory", dayData.photoStory)
+        contentValues.put("goals", gson.toJson(dayData.goals)) // List<Goal>을 JSON 문자열로 변환
+        contentValues.put("mood", dayData.mood)
+
+        // 데이터베이스에 저장
+        db.insert("day_data", null, contentValues)
+        db.close()
+    }
+
+    @SuppressLint("Range")
+    fun getDayDataByDate(date: String): DayData? {
+        val db = this.readableDatabase
+        val cursor = db.query("day_data", null, "date = ?", arrayOf(date), null, null, null)
+
+        if (cursor.moveToFirst()) {
+            val gson = Gson()
+            // 커서에서 데이터 추출 및 DayData 객체 생성
+            val retrievedDate = cursor.getString(cursor.getColumnIndex("date"))
+            val todoListJson = cursor.getString(cursor.getColumnIndex("todoList"))
+            val photoUri = cursor.getString(cursor.getColumnIndex("photoUri"))
+            val photoStory = cursor.getString(cursor.getColumnIndex("photoStory"))
+            val goalsJson = cursor.getString(cursor.getColumnIndex("goals"))
+            val mood = cursor.getString(cursor.getColumnIndex("mood"))
+
+            // JSON 문자열을 List<Goal>로 변환
+            val goalsType = object : TypeToken<List<Goal>>() {}.type
+            val goals = gson.fromJson<List<Goal>>(goalsJson, goalsType)
+
+            cursor.close()
+            db.close()
+            return DayData(retrievedDate, gson.fromJson(todoListJson, object : TypeToken<List<String>>() {}.type), photoUri, photoStory, goals, mood)
+        }
+
+        cursor.close()
+        db.close()
+        return null
+    }
+}
+
