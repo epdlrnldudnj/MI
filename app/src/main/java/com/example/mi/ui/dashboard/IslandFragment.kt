@@ -108,39 +108,7 @@ class IslandFragment : Fragment() {
                 }
         }
     }
-    private fun updateMindPiece(how: Int) {
-        val uid = auth.currentUser?.uid
-        uid?.let {
-            // Firestore에서 현재 MindPiece 값을 불러오기
-            db.collection("users").document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document != null) {
-                        // 현재 MindPiece 값을 가져오기
-                        val currentMindPiece = document.getLong("MindPiece") ?: 0
 
-                        // 증가 혹은 감소된 값을 계산
-                        val updatedMindPiece = currentMindPiece + how
-
-                        // Firestore에 업데이트된 MindPiece 값을 저장
-                        db.collection("users").document(uid)
-                            .update("MindPiece", updatedMindPiece)
-                            .addOnSuccessListener {
-                                // 업데이트 성공 시 TextView에 표시
-                                binding.piece.text = updatedMindPiece.toString()
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.w(TAG, "Error updating document", exception)
-                            }
-                    } else {
-                        Log.d(TAG, "No such document")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
-                }
-        }
-    }
     private fun addFlowerImage(flower: Flower, x: Number, y:Number) {
         val imageView = ImageView(requireContext())
         val width = 200
