@@ -158,6 +158,10 @@ class DayFragment : Fragment() {
         dayData.photoUri?.let { uri ->
             Glide.with(this).load(Uri.parse(uri)).into(binding.btnAddPhoto)
         }
+        dayData.mood?.let { mood ->
+            val moodImageRes = getImageResourceForMood(mood)
+            binding.btnMoodBox.setImageResource(moodImageRes)  // 기분에 해당하는 이미지로 설정
+        }
     }
 
 
@@ -171,8 +175,8 @@ class DayFragment : Fragment() {
             goalAdapter.notifyDataSetChanged()
         }
         binding.photostory.setText("")
-        binding.btnMoodBox.setImageResource(R.drawable.check)
-        binding.btnAddPhoto.setImageResource(R.drawable.check)
+        binding.btnMoodBox.setImageResource(R.drawable.add_emoji)
+        binding.btnAddPhoto.setImageResource(R.drawable.add_emoji)
     }
 
     private fun showAddItemDialog() {
