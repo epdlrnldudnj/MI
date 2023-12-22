@@ -29,6 +29,8 @@ import com.bumptech.glide.Glide
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
 import com.google.common.reflect.TypeToken
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -56,6 +58,9 @@ class DayFragment : Fragment() {
 
     private lateinit var rvGoal: RecyclerView
 
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,8 +77,8 @@ class DayFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
         recyclerView = view.findViewById(R.id.rvItems)
         adapter = ChecklistAdapter() // 이 부분을 맨 위로 이동
         recyclerView.adapter = adapter
@@ -190,6 +195,7 @@ class DayFragment : Fragment() {
 
         binding.photostory.text = Editable.Factory.getInstance().newEditable(dayData.photoStory ?: "")
         dayData.photoUri?.let { uri ->
+            updateMindPiece(10)
             Glide.with(this).load(Uri.parse(uri)).into(binding.btnAddPhoto)
         }
         dayData.mood?.let { mood ->
@@ -221,6 +227,7 @@ class DayFragment : Fragment() {
             .setTitle("체크리스트 항목 추가")
             .setView(dialogView)
             .setPositiveButton("저장") { dialog, which ->
+                updateMindPiece(10)
                 val itemText = editText.text.toString()
                 if (itemText.isNotEmpty()) {
                     adapter.addItem(itemText)
@@ -275,6 +282,7 @@ class DayFragment : Fragment() {
                 val millis = date?.time ?: 0
 
                 if (millis > 0) {
+                    updateMindPiece(10)
                     val newGoal = Goal(editTextGoalName, editTextGoalPercentage.toInt(), millis)
                     goalsList.add(newGoal)
                     goalAdapter.notifyDataSetChanged()
@@ -293,6 +301,7 @@ class DayFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle("기분을 선택하세요")
             .setItems(moods) { dialog, which ->
+                updateMindPiece(10)
                 selectedMood = moods[which]
                 selectedMood?.let {
                     binding.btnMoodBox.setImageResource(getImageResourceForMood(it))
@@ -344,6 +353,39 @@ class DayFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    private fun updateMindPiece(how: Int) {
+        val uid = auth.currentUser?.uid
+        uid?.let {
+            // Firestore에서 현재 MindPiece 값을 불러오기
+            db.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null) {
+                        // 현재 MindPiece 값을 가져오기
+                        val currentMindPiece = document.getLong("MindPiece") ?: 0
+
+                        // 증가 혹은 감소된 값을 계산
+                        val updatedMindPiece = currentMindPiece + how
+
+                        // Firestore에 업데이트된 MindPiece 값을 저장
+                        db.collection("users").document(uid)
+                            .update("MindPiece", updatedMindPiece)
+                            .addOnSuccessListener {
+                                // 업데이트 성공 시 TextView에 표시
+                                //binding.piece.text = updatedMindPiece.toString()
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.w(ContentValues.TAG, "Error updating document", exception)
+                            }
+                    } else {
+                        Log.d(ContentValues.TAG, "No such document")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(ContentValues.TAG, "get failed with ", exception)
+                }
+        }
     }
 }
 data class DayData(
