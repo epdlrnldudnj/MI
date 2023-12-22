@@ -272,7 +272,7 @@ class DayFragment : Fragment() {
             "슬픔" -> R.drawable.depression
             "피곤" -> R.drawable.tiredness
             "체크" -> R.drawable.check
-            else -> R.drawable.check
+            else -> R.drawable.add_emoji
         }
     }
 
@@ -290,6 +290,8 @@ class DayFragment : Fragment() {
         val dayDataManager = DayDataManager(requireContext())
         dayDataManager.saveDayData(dayData)
         Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        Log.d("DayFragment", "Loading data for date: $date, result: $dayData")
+
         try {
             val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
             val dayDataManager = DayDataManager(requireContext())
@@ -366,6 +368,7 @@ class MyDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
     }
 
 
+    @SuppressLint("Range")
     fun saveDayData(dayData: DayData) {
         val db = this.writableDatabase
         val gson = Gson()
@@ -379,10 +382,24 @@ class MyDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
         contentValues.put("goals", gson.toJson(dayData.goals)) // List<Goal>을 JSON 문자열로 변환
         contentValues.put("mood", dayData.mood)
 
-        // 데이터베이스에 저장
-        db.insert("day_data", null, contentValues)
+        // 해당 날짜에 대한 데이터가 이미 있는지 확인
+        val cursor = db.query("day_data", arrayOf("id"), "date = ?", arrayOf(dayData.date), null, null, null)
+        val exists = cursor.moveToFirst()
+
+        if (exists) {
+            // 이미 데이터가 있으면 업데이트
+            val id = cursor.getInt(cursor.getColumnIndex("id"))
+            db.update("day_data", contentValues, "id = ?", arrayOf(id.toString()))
+        } else {
+            // 데이터가 없으면 새로 삽입
+            db.insert("day_data", null, contentValues)
+        }
+
+        // 리소스 정리
+        cursor.close()
         db.close()
     }
+
 
     @SuppressLint("Range")
     fun getDayDataByDate(date: String): DayData? {
