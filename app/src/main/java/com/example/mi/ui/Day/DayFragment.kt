@@ -110,6 +110,7 @@ class DayFragment : Fragment() {
             }
         }
         binding.btnAddPhoto.setOnClickListener {
+            updateMindPiece(10)
             pickImageFromGallery()
         }
 
@@ -195,7 +196,7 @@ class DayFragment : Fragment() {
 
         binding.photostory.text = Editable.Factory.getInstance().newEditable(dayData.photoStory ?: "")
         dayData.photoUri?.let { uri ->
-            updateMindPiece(10)
+
             Glide.with(this).load(Uri.parse(uri)).into(binding.btnAddPhoto)
         }
         dayData.mood?.let { mood ->
