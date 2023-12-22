@@ -19,6 +19,8 @@
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                android:orientation="horizontal"
+               android:layout_marginTop="10dp"
+
                >
 
                <ImageButton
@@ -26,7 +28,10 @@
                    android:layout_width="0dp"
                    android:layout_height="wrap_content"
                    android:src="@drawable/calender_left"
-                   android:layout_weight="1"/>
+                   android:layout_weight="1"
+                   android:background="#00FFFFFF"
+
+                   />
 
                <TextView
                    android:id="@+id/textViewMonthYear"
@@ -41,7 +46,8 @@
                    android:layout_width="0dp"
                    android:layout_height="wrap_content"
                    android:src="@drawable/calender_right"
-                   android:layout_weight="1"/>
+                   android:layout_weight="1"
+                   android:background="#00FFFFFF"/>
            </LinearLayout>
             <!-- 각 요일을 표시하는 TextView들 -->
            <LinearLayout
