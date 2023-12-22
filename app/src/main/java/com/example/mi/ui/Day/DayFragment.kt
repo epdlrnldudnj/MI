@@ -1,163 +1,237 @@
 package com.example.mi.ui.Day
 
-import android.content.ContentValues.TAG
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.graphics.Rect
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import android.net.Uri
-import android.os.Handler
-import android.os.Looper
+import android.text.Editable
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mi.R
 import com.example.mi.databinding.FragmentDayBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import java.text.ParseException
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class DayFragment : Fragment(R.layout.fragment_day) {
-    private var binding: FragmentDayBinding? = null
-    private val handler = Handler(Looper.getMainLooper())
-    private lateinit var pickImageLauncher: ActivityResultLauncher<String>
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: ChecklistAdapter
-    private lateinit var rvGoal: RecyclerView
+class DayFragment : Fragment() {
+
+    private var selectedImageUri: Uri? = null
+    private var selectedMood: String? = null
+
+    private lateinit var dbHelper: MyDatabaseHelper
     private lateinit var goalAdapter: GoalAdapter
     private val goalsList: MutableList<Goal> = mutableListOf()
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
 
-    private lateinit var database: DatabaseReference
 
-    private val updateRunnable = object : Runnable {
-        override fun run() {
-            updateDateTime()
-            handler.postDelayed(this, 1000)
-        }
+    private var _binding: FragmentDayBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ChecklistAdapter
+
+    private lateinit var pickImageLauncher: ActivityResultLauncher<String>
+
+    private lateinit var rvGoal: RecyclerView
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentDayBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onDestroyView() {
-        handler.removeCallbacks(updateRunnable)
-        super.onDestroyView()
-    }
-
-    private fun updateDateTime() {
-        // 'selectedDate'가 null이면 현재 날짜를 사용합니다.
-        val selectedDate = arguments?.getString("selectedDate") ?: getCurrentDate()
-
+    private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        try {
-            val parsedDate = dateFormat.parse(selectedDate)
-            val dateTimeString = dateFormat.format(parsedDate)
-            binding?.dayDate?.text = dateTimeString
-        } catch (e: ParseException) {
-            // 날짜 파싱 실패 처리
-            Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show()
-        }
+        return dateFormat.format(Date())
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // FirebaseAuth 인스턴스 초기화
-        auth = FirebaseAuth.getInstance()
-        // FirebaseFirestore 인스턴스 초기화
-        db = FirebaseFirestore.getInstance()
-        // FirebaseDatabase 인스턴스 초기화 (필요한 경우)
-        database = FirebaseDatabase.getInstance().getReference("days")
-    }
-
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentDayBinding.bind(view)
-        database = FirebaseDatabase.getInstance().getReference("days")
-        handler.post(updateRunnable)
 
-        /// FirebaseAuth 인스턴스 초기화
-        auth = FirebaseAuth.getInstance()
-        // FirebaseFirestore 인스턴스 초기화
-        db = FirebaseFirestore.getInstance()
-        // FirebaseDatabase 인스턴스 초기화 (필요한 경우)
-        database = FirebaseDatabase.getInstance().getReference("days")
-
-        updateDateTime()
-        val currentDate = arguments?.getString("selectedDate") ?: getCurrentDate()
-        // Bundle에서 선택된 날짜를 가져옵니다.
-        val selectedDate = arguments?.getString("selectedDate")
-
-        // 선택된 날짜를 사용하여 UI 업데이트
-        updateUIForSelectedDate(selectedDate)
-
-        binding?.btnMoodBox?.setOnClickListener {
-            showMoodSelector()
-        }
-        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                updateMindPiece(10)
-                binding?.btnAddPhoto?.setImageURI(uri)
-            }
-        }
-
-        binding?.btnAddPhoto?.setOnClickListener {
-            pickImageFromGallery()
-        }
 
         recyclerView = view.findViewById(R.id.rvItems)
+        adapter = ChecklistAdapter() // 이 부분을 맨 위로 이동
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         rvGoal = view.findViewById(R.id.rvgoal)
 
-        adapter = ChecklistAdapter()
-        recyclerView.adapter = adapter
+        goalAdapter = GoalAdapter()
+        rvGoal.adapter = goalAdapter
+        rvGoal.layoutManager = LinearLayoutManager(requireContext())
+
+        dbHelper = MyDatabaseHelper(requireContext())
+
+        setTodayAsDefaultDate()
+        binding.dayDate.setOnClickListener {
+            showDatePicker()
+        }
+        loadDayData(getCurrentDate())
 
         val imageButton: ImageButton = view.findViewById(R.id.imageButton)
         imageButton.setOnClickListener {
             showAddItemDialog()
         }
-        recyclerView.layoutManager = LinearLayoutManager(context)
 
-        goalAdapter = GoalAdapter(goalsList)
-        rvGoal.adapter = goalAdapter
-        rvGoal.layoutManager = LinearLayoutManager(context)
+        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                binding.btnAddPhoto.setImageURI(uri)
+                selectedImageUri = uri // 이미지 URI 업데이트
+            }
+        }
+        binding.btnAddPhoto.setOnClickListener {
+            pickImageFromGallery()
+        }
 
         val goalButton: ImageButton = view.findViewById(R.id.goalbutton)
         goalButton.setOnClickListener {
             showAddGoalDialog()
         }
-        rvGoal.layoutManager = LinearLayoutManager(context)
+
+        binding.btnMoodBox.setOnClickListener {
+            showMoodSelector()
+        }
+
+        binding.btnSetGoal.setOnClickListener {
+            saveDayData()
+        }
+
+        // calendar에서 선택된 날짜 가져오기
+        val selectedDateStr = arguments?.getString("selectedDate")
+        selectedDateStr?.let {
+            val selectedDate = LocalDate.parse(it)  // 문자열을 LocalDate 객체로 변환
+            updateCalendarUI(selectedDate)  // 선택된 날짜로 UI 업데이트
+            // 해당 날짜 데이터 로드
+        }
+
     }
-    private fun getCurrentDate(): String {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateCalendarUI(date: LocalDate) {
+        // LocalDate 객체를 "yyyy년 MM월 dd일" 형식의 문자열로 변환
+        val formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        // 변환된 문자열을 TextView에 설정
+        binding.dayDate.text = formattedDate
+        val getday =formattedDate
+        // 조회된 데이터로 UI 업데이트
+        if (getday != null) {
+            loadDayData(getday)
+        } else {
+            // 데이터가 없을 경우 사용자에게 알리거나 새로운 데이터 입력을 유도하는 로직을 구현합니다.
+            Toast.makeText(context, "No data found for $formattedDate", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+
+
+    private fun setTodayAsDefaultDate() {
+        val today = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return dateFormat.format(Date())
+        val todayStr = dateFormat.format(today.time)
+        binding.dayDate.text = todayStr
     }
-    private fun updateUIForSelectedDate(date: String?) {
-        // 선택된 날짜에 대한 UI 업데이트 로직
-        // 예: 선택된 날짜를 텍스트 뷰에 표시
-        binding?.dayDate?.text = date
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+            val dateStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+            binding.dayDate.text = dateStr
+
+            // 화면 초기화 및 데이터 불러오기
+            resetUI()
+            loadDayData(dateStr)
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
+    private fun loadDayData(date: String) {
+        val dayData = dbHelper.getDayDataByDate(date)
+        Log.d("DayFragment", "Loading data for date: $date, result: $dayData")
+        if (dayData != null) {
+            updateUI(dayData)
+        } else {
+            resetUI()
+        }
+    }
+    private fun updateUI(dayData: DayData) {
+        adapter.updateItems(dayData.todoList ?: listOf())
+        goalAdapter.updateGoals(dayData.goals ?: listOf())
+
+        Log.d("DayFragment", "Goals JSON: ${dayData.goals}")
+
+        binding.photostory.text = Editable.Factory.getInstance().newEditable(dayData.photoStory ?: "")
+        dayData.photoUri?.let { uri ->
+            Glide.with(this).load(Uri.parse(uri)).into(binding.btnAddPhoto)
+        }
+        dayData.mood?.let { mood ->
+            val moodImageRes = getImageResourceForMood(mood)
+            binding.btnMoodBox.setImageResource(moodImageRes)  // 기분에 해당하는 이미지로 설정
+        }
+    }
+
+
+
+    private fun resetUI() {
+        if (::adapter.isInitialized) {
+            adapter.updateItems(listOf())
+        }
+        if (::goalAdapter.isInitialized) {
+            goalsList.clear()
+            goalAdapter.notifyDataSetChanged()
+        }
+        binding.photostory.setText("")
+        binding.btnMoodBox.setImageResource(R.drawable.add_emoji)
+        binding.btnAddPhoto.setImageResource(R.drawable.add_emoji)
+    }
+
+    private fun showAddItemDialog() {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_checklist_item, null)
+        val editText = dialogView.findViewById<EditText>(R.id.editTextChecklistItem)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("체크리스트 항목 추가")
+            .setView(dialogView)
+            .setPositiveButton("저장") { dialog, which ->
+                val itemText = editText.text.toString()
+                if (itemText.isNotEmpty()) {
+                    adapter.addItem(itemText)
+                }
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    private fun pickImageFromGallery() {
+        pickImageLauncher.launch("image/*")
     }
 
     private fun showAddGoalDialog() {
@@ -169,35 +243,27 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("목표 추가")
             .setView(dialogView)
-            .setPositiveButton("저장", null) // 저장 버튼을 클릭한 후에 처리하기 위해 null로 설정
+            .setPositiveButton("저장", null)
             .setNegativeButton("취소", null)
             .show()
 
-        // 종료일 설정 버튼 클릭 이벤트 리스너를 설정합니다.
         btnSetEndDate.setOnClickListener {
             val calendar = Calendar.getInstance()
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
-                DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
-                    // 사용자가 날짜를 선택한 후의 동작을 여기에 추가합니다.
+                { _, year, month, dayOfMonth ->
                     val selectedDate = Calendar.getInstance()
                     selectedDate.set(year, month, dayOfMonth)
-
-                    // 선택한 날짜와 현재 날짜와의 차이를 계산하여 밀리초로 변환
-                    val millis = selectedDate.timeInMillis
-
-                    // 선택한 날짜를 TextView 또는 다른 UI 요소에 표시할 수 있습니다.
-                    btnSetEndDate.text = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(selectedDate.time)
+                    val dateStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(selectedDate.time)
+                    btnSetEndDate.text = dateStr
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
             )
-
             datePickerDialog.show()
         }
 
-        // 저장 버튼 클릭 이벤트 리스너를 설정합니다.
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val editTextGoalName = tvGoalProgress.text.toString()
             val editTextGoalPercentage = etGoalPercentage.text.toString()
@@ -209,13 +275,10 @@ class DayFragment : Fragment(R.layout.fragment_day) {
                 val millis = date?.time ?: 0
 
                 if (millis > 0) {
-                    updateMindPiece(10)
-
                     val newGoal = Goal(editTextGoalName, editTextGoalPercentage.toInt(), millis)
                     goalsList.add(newGoal)
                     goalAdapter.notifyDataSetChanged()
-
-                    dialog.dismiss() // 다이얼로그 닫기
+                    dialog.dismiss()
                 } else {
                     Toast.makeText(context, "유효한 날짜를 선택하세요.", Toast.LENGTH_SHORT).show()
                 }
@@ -225,35 +288,15 @@ class DayFragment : Fragment(R.layout.fragment_day) {
         }
     }
 
-
-    private fun showAddItemDialog() {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_checklist_item, null)
-        val editText = dialogView.findViewById<EditText>(R.id.editTextChecklistItem)
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("체크리스트 항목 추가")
-            .setView(dialogView)
-            .setPositiveButton("저장") { dialog, which ->
-                updateMindPiece(10)
-                val itemText = editText.text.toString()
-                if (itemText.isNotEmpty()) {
-                    adapter.addItem(itemText)
-                }
-
-            }
-            .setNegativeButton("취소", null)
-            .show()
-    }
-
     private fun showMoodSelector() {
         val moods = arrayOf("행복", "기쁨", "슬픔", "화남", "평온", "피곤", "체크")
         AlertDialog.Builder(requireContext())
             .setTitle("기분을 선택하세요")
             .setItems(moods) { dialog, which ->
-                val selectedMood = moods[which]
-                binding?.btnMoodBox?.setImageResource(getImageResourceForMood(selectedMood))
-                updateMindPiece(10)
-
+                selectedMood = moods[which]
+                selectedMood?.let {
+                    binding.btnMoodBox.setImageResource(getImageResourceForMood(it))
+                }
             }
             .show()
     }
@@ -267,102 +310,163 @@ class DayFragment : Fragment(R.layout.fragment_day) {
             "슬픔" -> R.drawable.depression
             "피곤" -> R.drawable.tiredness
             "체크" -> R.drawable.check
-            else -> R.drawable.check
-        }
-
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            pickImageFromGallery()
-        } else {
-            Toast.makeText(context, "권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            else -> R.drawable.add_emoji
         }
     }
 
-    private fun pickImageFromGallery() {
-        pickImageLauncher.launch("image/*")
-    }
+    private fun saveDayData() {
+        val gson = Gson()
+        val date = binding.dayDate.text.toString()
+        val todoList = adapter.getItems()
+        val photoUri = selectedImageUri?.toString()
+        val photoStory = binding.photostory.text.toString()
+        val goalsJson = gson.toJson(goalsList) // Goal 객체 목록을 JSON 문자열로 변환합니다.
+        val mood = selectedMood
 
-    companion object {
-        private const val PERMISSION_REQUEST_READ_STORAGE = 101
-        private const val PICK_IMAGE_REQUEST = 102
-    }
-    private fun saveData(date: String, data: DayData) {
-        database.child(date).setValue(data)
-            .addOnSuccessListener {
-                // 데이터 저장 성공 처리
-                Toast.makeText(context, "Data saved successfully", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                // 데이터 저장 실패 처리
-                Toast.makeText(context, "Failed to save data", Toast.LENGTH_SHORT).show()
-            }
-    }
+        // JSON 문자열이 아니라, 직렬화된 JSON 문자열을 DayData 객체에 저장합니다.
+        val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
+        val dayDataManager = DayDataManager(requireContext())
+        dayDataManager.saveDayData(dayData)
+        Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        Log.d("DayFragment", "Loading data for date: $date, result: $dayData")
 
-    private fun loadData(date: String) {
-        database.child(date).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val data = dataSnapshot.getValue(DayData::class.java)
-                // 데이터 불러오기 성공, UI 업데이트
-                updateUI(data)
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // 데이터 불러오기 실패 처리
-                Toast.makeText(context, "Failed to load data", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun updateUI(data: DayData?) {
-        data?.let {
-            // 예: 텍스트뷰, 이미지뷰 업데이트
-            //binding.textView.text = it.text
-            //binding.imageView.loadImage(it.imageUrl) // 이미지 로드 함수는 별도 구현 필요
-            // 기타 UI 업데이트
+        try {
+            val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
+            val dayDataManager = DayDataManager(requireContext())
+            dayDataManager.saveDayData(dayData)
+            Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Log.e("DayFragment", "Error saving day data", e)
+            Toast.makeText(context, "데이터 저장 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
         }
     }
-    data class DayData(
-        val text: String? = null,
-        val imageUrl: String? = null,
-        val mood: String? = null
-        // 기타 필요한 필드를 추가할 수 있습니다.
-    )
 
-    private fun updateMindPiece(how: Int) {
-        val uid = auth.currentUser?.uid
-        uid?.let {
-            // Firestore에서 현재 MindPiece 값을 불러오기
-            db.collection("users").document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document != null) {
-                        // 현재 MindPiece 값을 가져오기
-                        val currentMindPiece = document.getLong("MindPiece") ?: 0
-
-                        // 증가 혹은 감소된 값을 계산
-                        val updatedMindPiece = currentMindPiece + how
-
-                        // Firestore에 업데이트된 MindPiece 값을 저장
-                        db.collection("users").document(uid)
-                            .update("MindPiece", updatedMindPiece)
-                            .addOnSuccessListener {
-                                // 업데이트 성공 시 TextView에 표시
-                               // binding.piece.text = updatedMindPiece.toString()
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.w(TAG, "Error updating document", exception)
-                            }
-                    } else {
-                        Log.d(TAG, "No such document")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
-                }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
+data class DayData(
+    val date: String,
+    val todoList: List<String>?,
+    val photoUri: String?,
+    val photoStory: String?,
+    val goals: List<Goal>?, // List<Goal> 타입으로 선언
+    val mood: String?
+)
+
+class DayDataManager(private val context: Context) {
+    private val dbHelper = MyDatabaseHelper(context)
+
+    fun saveDayData(dayData: DayData) {
+        // DayData 객체를 데이터베이스에 저장
+        dbHelper.saveDayData(dayData)
+    }
+
+    fun getDayDataByDate(date: String): DayData? {
+        // 주어진 날짜에 해당하는 DayData 객체를 데이터베이스에서 검색
+        return dbHelper.getDayDataByDate(date)
+    }
+
+}
+
+
+class MyDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+    // 데이터베이스 버전 및 테이블 구조 정의
+    companion object {
+        private const val DATABASE_VERSION = 1
+        private const val DATABASE_NAME = "MyDatabase.db"
+        // ... (기타 필요한 상수 정의)
+    }
+
+    override fun onCreate(db: SQLiteDatabase?) {
+        // 테이블 생성 SQL 문
+        val CREATE_DAY_DATA_TABLE = """
+        CREATE TABLE day_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT,
+            todoList TEXT,
+            photoUri TEXT,
+            photoStory TEXT,
+            goals TEXT,
+            mood TEXT
+        )
+    """.trimIndent()
+
+        // 데이터베이스에 테이블 생성
+        db?.execSQL(CREATE_DAY_DATA_TABLE)
+    }
+
+
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        // 데이터베이스 스키마가 변경되었을 때 기존 테이블을 삭제하고 새로운 테이블을 생성합니다.
+        // 실제 애플리케이션에서는 사용자의 데이터를 보존하기 위해 마이그레이션 로직을 구현해야 할 수 있습니다.
+        db?.execSQL("DROP TABLE IF EXISTS day_data")
+        onCreate(db)
+    }
+
+
+    @SuppressLint("Range")
+    fun saveDayData(dayData: DayData) {
+        val db = this.writableDatabase
+        val gson = Gson()
+        val contentValues = ContentValues()
+
+        // DayData 객체의 필드를 ContentValues에 채움
+        contentValues.put("date", dayData.date)
+        contentValues.put("todoList", gson.toJson(dayData.todoList))
+        contentValues.put("photoUri", dayData.photoUri)
+        contentValues.put("photoStory", dayData.photoStory)
+        contentValues.put("goals", gson.toJson(dayData.goals)) // List<Goal>을 JSON 문자열로 변환
+        contentValues.put("mood", dayData.mood)
+
+        // 해당 날짜에 대한 데이터가 이미 있는지 확인
+        val cursor = db.query("day_data", arrayOf("id"), "date = ?", arrayOf(dayData.date), null, null, null)
+        val exists = cursor.moveToFirst()
+
+        if (exists) {
+            // 이미 데이터가 있으면 업데이트
+            val id = cursor.getInt(cursor.getColumnIndex("id"))
+            db.update("day_data", contentValues, "id = ?", arrayOf(id.toString()))
+        } else {
+            // 데이터가 없으면 새로 삽입
+            db.insert("day_data", null, contentValues)
+        }
+
+        // 리소스 정리
+        cursor.close()
+        db.close()
+    }
+
+
+    @SuppressLint("Range")
+    fun getDayDataByDate(date: String): DayData? {
+        val db = this.readableDatabase
+        val cursor = db.query("day_data", null, "date = ?", arrayOf(date), null, null, null)
+
+        if (cursor.moveToFirst()) {
+            val gson = Gson()
+            // 커서에서 데이터 추출 및 DayData 객체 생성
+            val retrievedDate = cursor.getString(cursor.getColumnIndex("date"))
+            val todoListJson = cursor.getString(cursor.getColumnIndex("todoList"))
+            val photoUri = cursor.getString(cursor.getColumnIndex("photoUri"))
+            val photoStory = cursor.getString(cursor.getColumnIndex("photoStory"))
+            val goalsJson = cursor.getString(cursor.getColumnIndex("goals"))
+            val mood = cursor.getString(cursor.getColumnIndex("mood"))
+
+            // JSON 문자열을 List<Goal>로 변환
+            val goalsType = object : TypeToken<List<Goal>>() {}.type
+            val goals = gson.fromJson<List<Goal>>(goalsJson, goalsType)
+
+            cursor.close()
+            db.close()
+            return DayData(retrievedDate, gson.fromJson(todoListJson, object : TypeToken<List<String>>() {}.type), photoUri, photoStory, goals, mood)
+        }
+
+        cursor.close()
+        db.close()
+        return null
+    }
+}
+
