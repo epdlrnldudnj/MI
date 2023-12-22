@@ -8,6 +8,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -20,6 +21,7 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +31,8 @@ import com.example.mi.databinding.FragmentDayBinding
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -65,8 +69,10 @@ class DayFragment : Fragment() {
         return dateFormat.format(Date())
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         recyclerView = view.findViewById(R.id.rvItems)
         adapter = ChecklistAdapter() // 이 부분을 맨 위로 이동
@@ -114,7 +120,35 @@ class DayFragment : Fragment() {
         binding.btnSetGoal.setOnClickListener {
             saveDayData()
         }
+
+        // calendar에서 선택된 날짜 가져오기
+        val selectedDateStr = arguments?.getString("selectedDate")
+        selectedDateStr?.let {
+            val selectedDate = LocalDate.parse(it)  // 문자열을 LocalDate 객체로 변환
+            updateCalendarUI(selectedDate)  // 선택된 날짜로 UI 업데이트
+             // 해당 날짜 데이터 로드
+        }
+
     }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateCalendarUI(date: LocalDate) {
+        // LocalDate 객체를 "yyyy년 MM월 dd일" 형식의 문자열로 변환
+        val formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        // 변환된 문자열을 TextView에 설정
+        binding.dayDate.text = formattedDate
+        val getday =formattedDate
+        // 조회된 데이터로 UI 업데이트
+        if (getday != null) {
+            loadDayData(getday)
+        } else {
+            // 데이터가 없을 경우 사용자에게 알리거나 새로운 데이터 입력을 유도하는 로직을 구현합니다.
+            Toast.makeText(context, "No data found for $formattedDate", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+
 
     private fun setTodayAsDefaultDate() {
         val today = Calendar.getInstance()
@@ -333,6 +367,7 @@ class DayDataManager(private val context: Context) {
         // 주어진 날짜에 해당하는 DayData 객체를 데이터베이스에서 검색
         return dbHelper.getDayDataByDate(date)
     }
+
 }
 
 

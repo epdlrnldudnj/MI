@@ -26,7 +26,9 @@
                    android:layout_width="0dp"
                    android:layout_height="wrap_content"
                    android:src="@drawable/calender_left"
-                   android:layout_weight="1"/>
+                   android:layout_weight="1"
+                   android:background="#00000000"
+                   android:layout_marginTop="10dp"/>
 
                <TextView
                    android:id="@+id/textViewMonthYear"
@@ -35,13 +37,16 @@
                    android:gravity="center"
                    android:text="December 2023"
                    android:textSize="25dp"
-                   android:layout_weight="2"/>
+                   android:layout_weight="2"
+                   android:layout_marginTop="10dp"/>
                <ImageButton
                    android:id="@+id/next_btn"
                    android:layout_width="0dp"
                    android:layout_height="wrap_content"
                    android:src="@drawable/calender_right"
-                   android:layout_weight="1"/>
+                   android:layout_weight="1"
+                   android:background="#00000000"
+                   android:layout_marginTop="10dp"/>
            </LinearLayout>
             <!-- 각 요일을 표시하는 TextView들 -->
            <LinearLayout
