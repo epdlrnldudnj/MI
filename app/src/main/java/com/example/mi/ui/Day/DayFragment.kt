@@ -41,6 +41,7 @@ import java.util.Locale
 
 class DayFragment : Fragment() {
 
+    //private val writableDatabase: Any
     private var selectedImageUri: Uri? = null
     private var selectedMood: String? = null
 
@@ -110,7 +111,7 @@ class DayFragment : Fragment() {
             }
         }
         binding.btnAddPhoto.setOnClickListener {
-            updateMindPiece(10)
+           // updateMindPiece(10)
             pickImageFromGallery()
         }
 
@@ -228,7 +229,7 @@ class DayFragment : Fragment() {
             .setTitle("체크리스트 항목 추가")
             .setView(dialogView)
             .setPositiveButton("저장") { dialog, which ->
-                updateMindPiece(10)
+               // updateMindPiece(10)
                 val itemText = editText.text.toString()
                 if (itemText.isNotEmpty()) {
                     adapter.addItem(itemText)
@@ -283,7 +284,7 @@ class DayFragment : Fragment() {
                 val millis = date?.time ?: 0
 
                 if (millis > 0) {
-                    updateMindPiece(10)
+                   // updateMindPiece(10)
                     val newGoal = Goal(editTextGoalName, editTextGoalPercentage.toInt(), millis)
                     goalsList.add(newGoal)
                     goalAdapter.notifyDataSetChanged()
@@ -302,7 +303,7 @@ class DayFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle("기분을 선택하세요")
             .setItems(moods) { dialog, which ->
-                updateMindPiece(10)
+               // updateMindPiece(10)
                 selectedMood = moods[which]
                 selectedMood?.let {
                     binding.btnMoodBox.setImageResource(getImageResourceForMood(it))
@@ -336,18 +337,32 @@ class DayFragment : Fragment() {
         // JSON 문자열이 아니라, 직렬화된 JSON 문자열을 DayData 객체에 저장합니다.
         val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
         val dayDataManager = DayDataManager(requireContext())
-        dayDataManager.saveDayData(dayData)
-        Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
-        Log.d("DayFragment", "Loading data for date: $date, result: $dayData")
 
+        // 데이터 저장 시도
         try {
-            val dayData = DayData(date, todoList, photoUri, photoStory, goalsList, mood)
-            val dayDataManager = DayDataManager(requireContext())
             dayDataManager.saveDayData(dayData)
             Toast.makeText(context, "데이터가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+            calculateAndUpdateMindPiece(dayData) // 점수 계산 및 업데이트
         } catch (e: Exception) {
             Log.e("DayFragment", "Error saving day data", e)
             Toast.makeText(context, "데이터 저장 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun calculateAndUpdateMindPiece(dayData: DayData) {
+        var pointsToAdd = 0 // 추가할 점수를 초기화
+
+        // 필드별로 null 검사 후 점수 증가
+        if (!dayData.date.isNullOrEmpty()) pointsToAdd += 0
+        if (!dayData.todoList.isNullOrEmpty()) pointsToAdd += 10
+        if (!dayData.photoUri.isNullOrEmpty()) pointsToAdd += 10
+        if (!dayData.photoStory.isNullOrEmpty()) pointsToAdd += 0
+        if (!dayData.goals.isNullOrEmpty()) pointsToAdd += 10
+        if (!dayData.mood.isNullOrEmpty()) pointsToAdd += 10
+
+        // 점수 업데이트 함수 호출
+        if (pointsToAdd > 0) {
+            updateMindPiece(pointsToAdd)
         }
     }
 
